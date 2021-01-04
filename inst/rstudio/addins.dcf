@@ -1,0 +1,14 @@
+Name: Insert dashes (---)
+Description: Inserts `---` at the cursor position up to 80 characters.
+Binding: set_new_chapter
+Interactive: false
+
+Name: New R script with header
+Description: Creates new R script with a commented header.
+Binding: create_R_with_header
+Interactive: false
+
+Name: Update header
+Description: Inserts (and overwrites) a commented header in the current file 
+Binding: update_header
+Interactive: false

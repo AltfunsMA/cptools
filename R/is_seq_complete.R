@@ -1,0 +1,178 @@
+#' Check whether there are different steps between the elements of a vector
+#'
+#' @param x A numeric vector.
+#' @inheritParams is_acno_complete
+#'
+#' @return A logical vector
+#' @export
+is.sequential <- function(x, comparison, step) {
+  #  TRUE for __full__ sequences where numbers are repeated
+  #  FALSE for those with gaps
+  #  i.e. it'll label false an entire state missing one AC_NO
+  
+  
+  out <- sort(x)
+  
+  if(is.null(step)) {step <- diff(out)[1]}
+  
+  all(comparison(diff(out), step)) 
+  
+  
+}
+
+
+#' Check for gaps in numeric sequence by group
+#'
+#' @description wrapper around \code{is_acno_complete}, which was
+#' originally created for checking which Assembly Constituency numbers 
+#' are missing 
+#' in a dataframe with Indian election data. 
+#' 
+#' Identifies **gaps** only, if the sequence is broken
+#' because of a duplication, use \code{duplicheck}.
+#' 
+#' 
+#' @inheritParams is_acno_complete 
+#' 
+#' 
+#' @return A data frame with two rows before and one after the gap 
+#' in the sequence, extracted by group.
+#' 
+#' @export
+#'
+is_seq_complete <- function(df, checkCols = NULL) {
+  
+  is_acno_complete(df, checkCols)
+  
+}
+
+
+
+#' Check for gaps in AC No. sequence in Indian states
+#' 
+#' @description Identifies **gaps** only, if the sequence is broken
+#' because of a duplication, use \code{duplicheck} 
+#'
+#' @param df A dataframe. The default assumes one column for state names 
+#' and one column for
+#' AC numbers. The state column name is automatically detected and
+#' the AC number column name assumed to be either AC_NO or ac_no.
+#' @param checkCols To override defaults, provide a character vector with 
+#' exactly two strings. The first names the grouping variable, and the second,
+#' the accompanying numeric sequence variable.
+#' @param comparison A relational operator for the check, with back-ticks.
+#' @param step Step to be used in comparison. Defaults to the difference 
+#' between the first and second elements of the vector.
+#' 
+#' 
+#' @return A data frame with two AC_NO before and one after the fault 
+#' in the AC_NO sequence, extracted per state.
+#' @export
+
+is_acno_complete <- function(df, 
+                             checkCols = NULL, 
+                             comparison = `==`,
+                             step = NULL) {
+  
+
+  if(is.null(checkCols)) {
+    group_name <- find_st_name_col(df) %>% str_to_lower() %>% sym()
+    
+    seq_name <- sym("ac_no")
+    
+  }
+  
+  else {
+    
+    checkCols <- str_to_lower(checkCols)
+    
+    group_name <- sym(checkCols[1])
+    seq_name <- sym(checkCols[2])
+    
+  }
+  
+  #So warning test below works better
+  df_preprocessed <- rename_all(df, str_to_lower)  %>% 
+    filter(!is.na(!!group_name)) %>% # Trying to fill in gaps in **known** st_names
+    rm_list_cols()
+  
+  if("year" %in% str_to_lower(colnames(df_preprocessed))) {
+    
+    uni_vals <- df_preprocessed %>% 
+      distinct(!!group_name, year) %>% 
+      count(!!group_name)
+    
+    if(any(uni_vals$n > 1)) {
+      
+      warning(
+        "\n Year column found with more than one unique value per group. ", 
+        "Results will be confusing/wrong if more than one year's worth of",
+        " election data per state is analysed through this function.\n")}
+    
+  }
+  
+  checked_by_group <- df_preprocessed %>%
+    distinct(!!group_name, !!seq_name) %>% 
+    arrange(!!group_name, !!seq_name) %>% 
+    group_by(!!group_name) %>%
+    mutate(complete_seq = is.sequential(!!seq_name, comparison, step)) %>%
+    ungroup() %>% 
+    filter(complete_seq == FALSE) %>% 
+    rowid_to_column() %>% 
+    select(-complete_seq)
+  
+  if(nrow(checked_by_group) < 1) {
+    cat("No missing sequences in any states. \n")
+    return(invisible(NULL))
+    
+  }
+  
+  
+  
+  extract_non_seq <- function(df_ext, seq_name) {
+    # Only works if the first two values have the correct difference in the sequence  
+    vector <- pull(df_ext, !!seq_name)
+    
+    y <- sort(vector)
+    
+    difference_first_vs_second_position <- diff(y)[1]
+    
+    before_gap_positions <- diff(y) != difference_first_vs_second_position
+    
+    y[before_gap_positions]  
+    
+  }
+  
+  extracted <- checked_by_group %>% 
+    # Split by state so that only one full ac_no sequence is passed
+    # to the extractor function
+    split(pull(checked_by_group, !!group_name), drop = TRUE) %>% 
+    map(~extract_non_seq(.x, seq_name)) %>% 
+    keep(~length(.x) > 0)
+  
+  group_str <- rlang::expr_text(group_name)
+  seq_str <- rlang::expr_text(seq_name)
+  
+  before_gap_id <- map_dfr(extracted, .id = group_str, as_tibble) %>% 
+    rename(!!seq_name := "value") %>% 
+    left_join(mutate_if(checked_by_group, is.factor, as.character), 
+              by = c(group_str, seq_str)) %>% 
+    pull(rowid)
+  
+  
+  gap_surrounds <- checked_by_group %>% 
+    filter(rowid %in% (before_gap_id - 1) |
+             rowid %in% before_gap_id | 
+             rowid %in% (before_gap_id + 1)) %>% 
+    select(-rowid) %>% 
+    rename_all(str_to_upper)
+  
+  
+  cat("Gaps identified at", sum(lengths(extracted)), 
+      "point(s) in the AC_NO sequence(s)", 
+      "of", length(extracted), "State(s). \n")
+  
+  
+  gap_surrounds
+  
+}

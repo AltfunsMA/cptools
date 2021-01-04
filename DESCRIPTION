@@ -1,0 +1,20 @@
+Package: cptools
+Type: Package
+Title: Tools for Consumer Pyramids and other Indian Data Wrangling
+Version: 0.1.0
+Authors@R: person("Alfonso", "Martínez Arranz", email = "alfonso.m.arranz@gmail.com",
+  role = c("aut", "cre"))
+Author: Alfonso Martínez Arranz
+Maintainer: Alfonso Martínez Arranz <alfonso.m.arranz@gmail.com>
+Description: This package attaches some convenience wrappers and test functions 
+    that are heavily used when combining Indian datasets from Consumer Pyramids, GIS, 
+    election data, etc.
+License: MIT License
+Encoding: UTF-8
+LazyData: true
+Depends:
+   tidyverse,
+   sf
+RoxygenNote: 7.1.0
+Suggests: 
+    testthat
