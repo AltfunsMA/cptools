@@ -23,7 +23,8 @@ create_india_map(
   legend_fill = "transparent",
   leg_just = c("right", "bottom"),
   leg_x = 0.85,
-  leg_y = 0.05
+  leg_y = 0.05,
+  show_disputed = FALSE
 )
 }
 \arguments{
