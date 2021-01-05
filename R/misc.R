@@ -42,10 +42,6 @@ rm_list_cols <- function(x) {
 #' sample_text <- c("ag;als", "w a;lsg;lak B", "l A jlajksf k")
 #' 
 #' str_count(sample_text, bound_rx(letters)
-#' 
-
-
-
 bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b", 
                      by_element = FALSE) {
   
