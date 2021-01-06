@@ -209,19 +209,28 @@ find_st_name_col <- function(df) {
 
 
 
-#' View without list-columns or geometry
+#' View (without crashing Rstudio)
 #'
-#' @description R's View() always tries to show geometry and other list columns
-#' but, most of the time, this is rather useless and slows things down.
-#' This function is designed to mask the default View(). It removes any list-columns,
-#' including geometry columns from data.frame objects.
-#' Using code modified from tibble::view(), it also allows RStudio to display
-#' and returns the object invisibly.
+#' @description R's View() always tries to open any object; but some common objects make Rstudio crash or slow things down.
+#' This function is designed to mask the default View(). This version removes by default any list-columns,
+#' including geometry columns from data.frame objects. It also blocks viewing large dataframes.
+#' It uses code modified from tibble::view() that allows RStudio to display
+#' and then returns the object invisibly.
 #'
 #' @param x An R object
-#' @param title The title of the (not working in tibble::utils)
+#' @param title An optional title chosen for the window that will display the object
+#' @param block_large_df Should large dataframes be blocked from displaying?
+#' @param rm_lc Should list-columns be removed?
+#' 
+#' @details Global options can be set to alter behaviour:
+#' \itemize{
+#'  \item{"cpview_mblim":} {an integer for maximum dataframe size in Mb (rough approximation)}
+#'  \item{"cpview_celllim":} {an integer for maximum number of dataframe columns}
+#'  \item{"cpview_warn":} {anything but `NULL` to silence warnings when removing list-columns}
+#' }
 #'
-#' @return Both the object (now without list-columns) and its visualisation
+#' 
+#' @return Both the object and its display
 #'
 #' @examples
 #' iris_same <- iris %>%
@@ -233,16 +242,73 @@ find_st_name_col <- function(df) {
 #' @import rlang
 #'
 #' @export
-View <- function(x, title = NULL) {
+View <- function(x, title = NULL,
+                 block_large_df = TRUE,
+                 rm_lc = TRUE) {
 
   # Code taken from tibble::utils, which was in development and seemed to
   # have a bug in the extraction of the title
 
+  osize <- object.size(x)
+  
+  cells <- length(x)*nrow(x)
+  
+  slim <- getOption("cpview_mblim", default = 200)
+  
+  celllim <- getOption("cpview_celllim", default = 1000000)
+  
+  oname <- deparse(substitute(x))
+  
+  stopview <- function(message, lim, lim_opt) {
+    
+    if(isTRUE(block_large_df)) {  warning("The '", oname, "' dataframe ", message, 
+                                 "\ncptools::View has a limit of ", lim, " because viewing large dataframes may crash Rstudio.",
+         "\nSet option '", lim_opt, "' to change this limit.",
+         "\nDeactivate data.frame size checks with: `View(", oname, ", block_large_df = FALSE)`",
+         "\nA sample of size 5 x 20 cells has been opened instead.",
+         call. = FALSE)
+    
+      
+      x <<- x[1:5, 1:20]
+      
+      
+    }
+      
+  }
+  
+  if (inherits(x, "data.frame")) {
+    
+    if (osize / 10**6 > slim) stopview(paste("is of size", format(osize, units = "MB")),
+                                            paste(slim, "Mb (approx.)"), "cpview_mblim")
+    
+    else if (cells > celllim) stopview(paste("has more than", scales::comma(cells), "cells"), 
+                                           paste(scales::comma(celllim), "cells"), "cpview_lenlim")
+    
+  }
+
+  
   if (is.null(title)) {
     title <- expr_deparse(enexpr(x))
   }
 
+  if(rm_lc) {
+  
+    before <- length(x)
+    
    x <- rm_list_cols(x)
+   
+   after <- length(x)
+   
+   if(is.null(getOption("cpview_warn")) && before > after) {
+     
+     warning("List-columns removed. 
+             \nTo hide this warning, set option 'cpview_warn' to FALSE.
+             \nTo keep list-columns, set the argument 'block_lc' to FALSE")
+     
+   }
+   
+   
+  }
 
   # Returns object invisibly
    if (!interactive())

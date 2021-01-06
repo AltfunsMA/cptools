@@ -2,25 +2,36 @@
 % Please edit documentation in R/misc.R
 \name{View}
 \alias{View}
-\title{View without list-columns or geometry}
+\title{View (without crashing Rstudio)}
 \usage{
-View(x, title = NULL)
+View(x, title = NULL, block_large_df = TRUE, rm_lc = TRUE)
 }
 \arguments{
 \item{x}{An R object}
 
-\item{title}{The title of the (not working in tibble::utils)}
+\item{title}{An optional title chosen for the window that will display the object}
+
+\item{block_large_df}{Should large dataframes be blocked from displaying?}
+
+\item{rm_lc}{Should list-columns be removed?}
 }
 \value{
-Both the object (now without list-columns) and its visualisation
+Both the object and its display
 }
 \description{
-R's View() always tries to show geometry and other list columns
-but, most of the time, this is rather useless and slows things down.
-This function is designed to mask the default View(). It removes any list-columns,
-including geometry columns from data.frame objects.
-Using code modified from tibble::view(), it also allows RStudio to display
-and returns the object invisibly.
+R's View() always tries to open any object; but some common objects make Rstudio crash or slow things down.
+This function is designed to mask the default View(). This version removes by default any list-columns,
+including geometry columns from data.frame objects. It also blocks viewing large dataframes.
+It uses code modified from tibble::view() that allows RStudio to display
+and then returns the object invisibly.
+}
+\details{
+Global options can be set to alter behaviour:
+\itemize{
+ \item{"cpview_mblim":} {an integer for maximum dataframe size in Mb (rough approximation)}
+ \item{"cpview_celllim":} {an integer for maximum number of dataframe columns}
+ \item{"cpview_warn":} {anything but `NULL` to silence warnings when removing list-columns}
+}
 }
 \examples{
 iris_same <- iris \%>\%
