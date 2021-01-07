@@ -70,18 +70,18 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
   else if(is.na(rx_var)) {return(rx_var)}
   
 
-  else if(grepl("(?", rx_str, fixed = T)) {
+  else if(grepl("(?", rx_var, fixed = T)) {
     
     warning("Bound_rx detected lookarounds, string supplied untouched.")
     
-    rx_str
+    rx_var
     
   }
   
   
-  else if(grepl("\\|", rx_str)) 
+  else if(grepl("\\|", rx_var)) 
     
-  { stringr::str_replace_all(rx_str,  stringr::fixed(c("|" = "\\b|\\b",
+  { stringr::str_replace_all(rx_var,  stringr::fixed(c("|" = "\\b|\\b",
                                                        "(" = "(\\b",
                                                        ")" = "\\b)")
   )
@@ -89,7 +89,7 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
   }
   
   
-  else {add_bounds(rx_str)}
+  else {add_bounds(rx_var)}
   
   
 }
@@ -101,8 +101,8 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
 #' @param pkg An R package as a string 
 #' (this was designed to quickly fix and test my own packages)
 #'
-#' @return By default, it restarts R and reattaches cptools.
-#' Otherwise, itetaches the named package if it is loaded 
+#' @return By default, it restarts R and reattaches \code{cptools}.
+#' Otherwise, it detaches the named package if it is loaded 
 #' and tries to attach it again.
 #' @export
 #'
@@ -249,27 +249,27 @@ View <- function(x, title = NULL,
   # Code taken from tibble::utils, which was in development and seemed to
   # have a bug in the extraction of the title
 
-  osize <- object.size(x)
+  objmb <- object.size(x)/10**6 
   
   cells <- length(x)*nrow(x)
   
-  slim <- getOption("cpview_mblim", default = 200)
+  mblim <- getOption("cpview_mblim", default = 200)
   
   celllim <- getOption("cpview_celllim", default = 1000000)
   
-  oname <- deparse(substitute(x))
+  objname <- deparse(substitute(x))
   
   stopview <- function(message, lim, lim_opt) {
     
-    if(isTRUE(block_large_df)) {  warning("The '", oname, "' dataframe ", message, 
+    if(isTRUE(block_large_df)) {  warning("The '", objname, "' dataframe ", message, 
                                  "\ncptools::View has a limit of ", lim, " because viewing large dataframes may crash Rstudio.",
          "\nSet option '", lim_opt, "' to change this limit.",
-         "\nDeactivate data.frame size checks with: `View(", oname, ", block_large_df = FALSE)`",
-         "\nA sample of size 5 x 20 cells has been opened instead.",
+         "\nDeactivate data.frame size checks with: `View(", objname, ", block_large_df = FALSE)`",
+         "\nA small sample of the dataframe has been opened instead.",
          call. = FALSE)
     
       
-      x <<- x[1:5, 1:20]
+      x <<- x[1:min(5, nrow(x)), 1:min(20, length(x))]
       
       
     }
@@ -278,11 +278,13 @@ View <- function(x, title = NULL,
   
   if (inherits(x, "data.frame")) {
     
-    if (osize / 10**6 > slim) stopview(paste("is of size", format(osize, units = "MB")),
-                                            paste(slim, "Mb (approx.)"), "cpview_mblim")
+    if (objmb > mblim) stopview(paste("is of size", format(objmb, units = "MB")),
+                                            paste(mblim, "Mb (approx.)"), 
+                                       "cpview_mblim")
     
-    else if (cells > celllim) stopview(paste("has more than", scales::comma(cells), "cells"), 
-                                           paste(scales::comma(celllim), "cells"), "cpview_lenlim")
+    else if (cells > celllim) stopview(paste("has", scales::comma(cells), "cells"), 
+                                           paste(scales::comma(celllim), "cells"), 
+                                       "cpview_lenlim")
     
   }
 

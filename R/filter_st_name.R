@@ -31,11 +31,11 @@ filter_st_name <- function(df, states = NA,
   not_in_cpw1 = c("Arunachal Pradesh", "Nagaland",
                   "Manipur", "Mizoram", "Tripura",
                   "Meghalaya", "Sikkim")
-  small_rich = c("Goa", "Delhi", "Puducherry", "Chandigarh")
-  no_vidhan = c("Lakashdweep", "Daman and Diu", 
-                "Dadra and Nagar Haveli", "Andaman and Nicobar",
-                "Dadra and Nagar Haveli and Daman and Diu", 
-                "Chandigarh")
+  
+  small_rich = c("Goa", "Delhi", "Puducherry", "Pondicherry", "Chandigarh")
+  
+  no_vidhan = c("Lakashdweep", "Daman", "Diu",  "Dadra", "Nagar Haveli", 
+                "Andaman", "Nicobar", "Chandigarh")
   
   
   states_to_filter <- switch (states,
@@ -45,30 +45,39 @@ filter_st_name <- function(df, states = NA,
                        all_above = c(not_in_cpw1, small_rich, no_vidhan),
                        several = several,
                        states
-  )
+  ) %>% 
+    bound_rx()
   
   
   if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df)}
   
   buscar <- function(strings, exclude) {
-    library(stringi)
     
-    if (exclude) {
-      map_lgl(strings, ~ !any((
-        stri_detect_regex(.x, states_to_filter,
-                          opts_regex = stri_opts_regex(case_insensitive = TRUE))
-      )))
-    }
-    
-    else {
-      map_lgl(strings, ~ any(
-        stri_detect_regex(.x, states_to_filter,
-                          opts_regex = stri_opts_regex(case_insensitive = TRUE))
-      ))
+      stringi::stri_detect_regex(strings, states_to_filter, negate = exclude)
       
     }
     
-  }
+  
+  
+  # buscar <- function(strings, exclude) {
+  #   library(stringi)
+  #   
+  #   if (exclude) {
+  #     map_lgl(strings, ~ !any((
+  #       stri_detect_regex(.x, states_to_filter,
+  #                         opts_regex = stri_opts_regex(case_insensitive = TRUE))
+  #     )))
+  #   }
+  #   
+  #   else {
+  #     map_lgl(strings, ~ any(
+  #       stri_detect_regex(.x, states_to_filter,
+  #                         opts_regex = stri_opts_regex(case_insensitive = TRUE))
+  #     ))
+  #     
+  #   }
+  #   
+  # }
 
   
     filter_at(df, vars(all_of(state_col_name)),
