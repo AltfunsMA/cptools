@@ -17,8 +17,3 @@
   invisible()
 }
 
-
-
-.onAttach <- function(libname, pkgname) {
-  packageStartupMessage("AMA custom functions loaded.")
-}

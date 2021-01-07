@@ -11,9 +11,11 @@
 #' @export
 duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ...) {
 
-  
-  df <- rename_with(df, str_to_upper)
 
+  sfcol <- attr(df, "sf_column")
+  
+  df <- rename_with(df, str_to_upper, .cols = -any_of(sfcol))
+  
   
   if (is.null(checkCols)) {
     if (!"STATE" %in% colnames(df)) {
@@ -23,12 +25,13 @@ duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ...) {
     }  else {checkCols <- c("STATE", "AC_NO")}
   
     } else {checkCols <- str_to_upper(checkCols) }
+
   
   vars <- syms(checkCols)
   
   minimum_distinct <- df %>% 
     rm_list_cols() %>% 
-    select(!!! vars)
+    select(!!! checkCols)
   
   checking <- function(option) {
     
@@ -39,6 +42,9 @@ duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ...) {
   
   
   if (is.null(fromLast)) {
+    
+    # browser()
+    
     one_end <- checking(FALSE)
     other_end <- checking(TRUE)
     
