@@ -2,27 +2,32 @@
 % Please edit documentation in R/filter_st_name.R
 \name{exclude_states}
 \alias{exclude_states}
-\title{Filtering out (types of) Indian states or Union Territories}
+\title{Exclude (types of) Indian states or Union Territories}
 \usage{
-exclude_states(df, states = NA, state_col_name = NULL)
+exclude_states(df, states, state_col_name = NULL)
 }
 \arguments{
-\item{df}{An object with class data.frame that has ONE column of Indian states}
+\item{df}{An object with class data.frame that has ONE column of Indian states.}
 
-\item{states}{What types of top level admin unit should be excluded. The 
-default is to filter out those states that are not in Wave 1 
-of Consumer Pyramids (but maintaining Union Territories if present). 
-Other options are \code{"small_rich"} (Goa, Delhi, Puducherry and Chandigarh), 
-\code{"no_vidhan"} (without legislative assembly), and \code{"all_above"}.
-
-It also accepts a character vector of state names.}
+\item{states}{Accepts either a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case, or the following options: 
+\itemize{
+ \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}
+ \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
+ \item{\code{"no_vidhan"}: those Union Territories without legislative assembly}
+ \item{\code{"northeast"}: Assam, Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Meghalaya, Sikkim)}
+ \item{\code{"all_above"}: all states in previous options}
+}}
 
 \item{state_col_name}{If more than column is known to be present, introduce
 the name of the correct column here as a string.}
 }
 \value{
-The same data.frame object withouth rows referring to the relevant states
+The same object WITHOUT rows referring to the relevant states
+
+#'
+
+The same data.frame object WITHOUT rows referring to the relevant states
 }
 \description{
-Filtering out (types of) Indian states or Union Territories
+Exclude (types of) Indian states or Union Territories
 }

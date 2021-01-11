@@ -2,12 +2,12 @@
 % Please edit documentation in R/filter_st_name.R
 \name{filter_cpw1_states}
 \alias{filter_cpw1_states}
-\title{Filtering out states not in Consumer Pyramids Wave 1}
+\title{Exclude states missing in Consumer Pyramids Wave 1}
 \usage{
 filter_cpw1_states(df, state_col_name = NULL)
 }
 \arguments{
-\item{df}{An object with class data.frame that has ONE column of Indian states}
+\item{df}{An object with class data.frame that has ONE column of Indian states.}
 
 \item{state_col_name}{If more than column is known to be present, introduce
 the name of the correct column here as a string.}
@@ -17,5 +17,5 @@ The same object withouth rows referring to
 Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Meghalaya, Sikkim
 }
 \description{
-Filtering out states not in Consumer Pyramids Wave 1
+Exclude states missing in Consumer Pyramids Wave 1
 }

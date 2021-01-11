@@ -11,8 +11,8 @@ restart_reattach(pkg = NULL)
 (this was designed to quickly fix and test my own packages)}
 }
 \value{
-By default, it restarts R and reattaches cptools.
-Otherwise, itetaches the named package if it is loaded 
+By default, it restarts R and reattaches \code{cptools}.
+Otherwise, it detaches the named package if it is loaded 
 and tries to attach it again.
 }
 \description{

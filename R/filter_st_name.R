@@ -1,36 +1,22 @@
-#' Filtering types of Indian states and/or union territories
-#'
-#' @param df An object with class data.frame that has ONE column of Indian states
-#' @param state_col_name If more than column is known to be present, introduce
-#' the name of the correct column here as a string.
-#' @param states What types of top level admin unit should be excluded. The 
-#' default is to filter out those states that are not in Wave 1 
-#' of Consumer Pyramids (but maintaining Union Territories if present). 
-#' Other options are \code{"small_rich"} (Goa, Delhi, Puducherry and Chandigarh), 
-#' \code{"no_vidhan"} (without legislative assembly), and \code{"all_above"}.
-#' 
-#' It also accepts a character vector of state names.
-#' 
-#' @param exclude Do we exclude the matches of state names or do we keep those?
-#' 
-#' @return The same object withouth rows referring to the relevant states
-#' @export
-#'
-filter_st_name <- function(df, states = NA,
-                           exclude = TRUE, state_col_name = NULL) {
+filter_st_name <- function(df, states, 
+                           exclude = TRUE, state_col_name = NULL,
+                           warn = TRUE) {
   
   if(length(states) > 1) {
     several <- states
     states <- "several"}
+
   
+  # If called from other cptools functions, they know what they should be selecting
   if(is.na(states)) {
-    warning("Nothing to filter. Please see function help for options (e.g. 'small_rich')")
     return(df)
     }
   
   not_in_cpw1 = c("Arunachal Pradesh", "Nagaland",
                   "Manipur", "Mizoram", "Tripura",
                   "Meghalaya", "Sikkim")
+  
+  northeast <- c("Assam", not_in_cpw1)
   
   small_rich = c("Goa", "Delhi", "Puducherry", "Pondicherry", "Chandigarh")
   
@@ -42,44 +28,24 @@ filter_st_name <- function(df, states = NA,
                        not_in_cpw1 = not_in_cpw1,
                        small_rich = small_rich,
                        no_vidhan = no_vidhan,
-                       all_above = c(not_in_cpw1, small_rich, no_vidhan),
+                       all_above = c(not_in_cpw1, small_rich, no_vidhan, northeast),
                        several = several,
                        states
   ) %>% 
-    bound_rx()
+    bound_rx(leftbound = "", rightbound = "")
   
   
   if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df)}
   
   buscar <- function(strings, exclude) {
     
-      stringi::stri_detect_regex(strings, states_to_filter, negate = exclude)
+      stringi::stri_detect_regex(strings, states_to_filter, 
+                                 case_insensitive = TRUE, 
+                                 negate = exclude)
       
     }
     
-  
-  
-  # buscar <- function(strings, exclude) {
-  #   library(stringi)
-  #   
-  #   if (exclude) {
-  #     map_lgl(strings, ~ !any((
-  #       stri_detect_regex(.x, states_to_filter,
-  #                         opts_regex = stri_opts_regex(case_insensitive = TRUE))
-  #     )))
-  #   }
-  #   
-  #   else {
-  #     map_lgl(strings, ~ any(
-  #       stri_detect_regex(.x, states_to_filter,
-  #                         opts_regex = stri_opts_regex(case_insensitive = TRUE))
-  #     ))
-  #     
-  #   }
-  #   
-  # }
 
-  
     filter_at(df, vars(all_of(state_col_name)),
               any_vars(buscar(., exclude)))
     
@@ -88,41 +54,58 @@ filter_st_name <- function(df, states = NA,
 
 
 
-#' Filtering out (types of) Indian states or Union Territories
+#' Exclude (types of) Indian states or Union Territories
+
+#' @param df An object with class data.frame that has ONE column of Indian states.
+#' @param state_col_name If more than column is known to be present, introduce
+#' the name of the correct column here as a string.
+#' @param states Accepts either a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case, or the following options: 
+#' \itemize{
+#'  \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}
+#'  \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
+#'  \item{\code{"no_vidhan"}: those Union Territories without legislative assembly}
+#'  \item{\code{"northeast"}: Assam, Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Meghalaya, Sikkim)}
+#'  \item{\code{"all_above"}: all states in previous options}
+#' }
+#' 
 #'
-#' @inheritParams filter_st_name 
 #'
-#' @return The same data.frame object withouth rows referring to the relevant states
+#' @return The same object WITHOUT rows referring to the relevant states
+#'
+#' #'
+#' @return The same data.frame object WITHOUT rows referring to the relevant states
 #' @export
+#' 
 #'
-exclude_states <- function(df, states = NA, state_col_name = NULL) {
+exclude_states <- function(df, states, state_col_name = NULL) {
   
-  
-  filter_st_name(df = df, states = states, state_col_name = state_col_name,
+  cptools:::filter_st_name(df = df, states = states, state_col_name = state_col_name,
                  exclude = TRUE)
+  
+  
 }
 
 
-#' Filtering for (types of) Indian states or Union Territories
+#' Select only rows with given (types of) Indian states or Union Territories
 #'
-#' @inheritParams filter_st_name 
+#' @inheritParams exclude_states  
 #'
-#' @return The same data.frame object withouth rows referring to the relevant states
+#' @return The same data.frame object WITH ONLY rows referring to the relevant states
 #' @export
 #'
-include_states <- function(df, states = NA, state_col_name = NULL) {
+include_states <- function(df, states, state_col_name = NULL) {
   
   
-  filter_st_name(df = df, states = states, state_col_name = state_col_name,
+  cptools:::filter_st_name(df = df, states = states, state_col_name = state_col_name,
                  exclude = FALSE)
 }
   
   
 
 
-#' Filtering out states not in Consumer Pyramids Wave 1
+#' Exclude states missing in Consumer Pyramids Wave 1
 #'
-#' @inheritParams filter_st_name
+#' @inheritParams exclude_states
 #'
 #' @return The same object withouth rows referring to 
 #' Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Meghalaya, Sikkim
@@ -130,7 +113,7 @@ include_states <- function(df, states = NA, state_col_name = NULL) {
 
 filter_cpw1_states <- function(df, state_col_name = NULL) {
   
-  filter_st_name(df, states = "not_in_cpw1", state_col_name = NULL)
+  cptools:::filter_st_name(df, states = "not_in_cpw1", state_col_name = NULL)
   
 }
 

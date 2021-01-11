@@ -4,7 +4,7 @@
 \alias{map_PDF}
 \title{Saving multiple plots into PDF from a list}
 \usage{
-map_PDF(plot_list, multiple = FALSE, nrow = 1, ncol = 1)
+map_PDF(plot_list, folder = NULL, multiple = FALSE, nrow = 1, ncol = 1)
 }
 \arguments{
 \item{plot_list}{A list of plots handled by gridExtra}

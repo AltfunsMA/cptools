@@ -10,16 +10,16 @@
 #' @export
 #'
 #' @examples
-map_PDF <- function(plot_list, multiple = FALSE, nrow = 1, ncol = 1) {
+map_PDF <- function(plot_list, folder = NULL, multiple = FALSE, nrow = 1, ncol = 1) {
   
   ifelse(!dir.exists("Maps_output"), dir.create("Maps_output"), FALSE)
   
   
-  if (multiple == TRUE) {
+  if (multiple) {
     
     for (i in plot_list) {
       
-      folder <-  deparse(substitute(plot_list))
+      if(is.null(folder)) folder <-  deparse(substitute(plot_list))
       
       
       title <- as.character(i[["labels"]][["title"]])
@@ -41,7 +41,11 @@ map_PDF <- function(plot_list, multiple = FALSE, nrow = 1, ncol = 1) {
       ifelse(!dir.exists(file.path("Maps_output/", folder)),
              dir.create(file.path("Maps_output/", folder)), FALSE)
       
-      ggplot2::ggsave(filename = fullpath, plot = i)
+      tryCatch(ggplot2::ggsave(filename = fullpath, plot = i),
+               error = function(cond) {
+                 message(cond)
+                 write_lines(cond, str_replace(fullpath, "\\.pdf$", ".txt"))
+                 })
       
     }
     

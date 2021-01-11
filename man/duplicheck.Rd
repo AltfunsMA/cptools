@@ -13,7 +13,7 @@ duplicheck(df, checkCols = NULL, fromLast = NULL, ...)
 dataset to be checked for duplicates. Defaults to ST_NAME/STATE and AC_NO.}
 
 \item{fromLast}{As in \code{duplicated}. The default \code{NULL} means that 
-both sides will be checked and returned (i.e. )}
+both sides will be checked and returned.}
 
 \item{...}{Arguments passed on to \code{duplicated}.}
 }
