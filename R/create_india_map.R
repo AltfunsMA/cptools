@@ -4,7 +4,7 @@
 
 #' Create maps of India from sf objects with sensible defaults
 #'
-#' @param df An dataframe with a simple features geometry column
+#' @param df A dataframe with a simple features geometry column (representing India of course)
 #' @param title The title of the plot
 #' @param subtitle 
 #' @param fill_var The variable to fill the text with. If empty, it takes the 
@@ -229,7 +229,9 @@ create_india_map <-  function(df,
       values = c(
         "State" = "black",
         "District" = "grey50",
-        "Lowest" = "grey70"
+        "Lowest" = "grey70",
+        "black",
+        "black"
       ),
       labels = c(
         "State" = "State boundary",

@@ -2,38 +2,55 @@ filter_st_name <- function(df, states,
                            exclude = TRUE, state_col_name = NULL,
                            warn = TRUE) {
   
-  if(length(states) > 1) {
-    several <- states
-    states <- "several"}
-
+  # states <- rlang::enquos(states)
   
-  # If called from other cptools functions, they know what they should be selecting
-  if(is.na(states)) {
-    return(df)
-    }
-  
-  not_in_cpw1 = c("Arunachal Pradesh", "Nagaland",
-                  "Manipur", "Mizoram", "Tripura",
-                  "Meghalaya", "Sikkim")
-  
-  northeast <- c("Assam", not_in_cpw1)
-  
-  small_rich = c("Goa", "Delhi", "Puducherry", "Pondicherry", "Chandigarh")
-  
-  no_vidhan = c("Lakashdweep", "Daman", "Diu",  "Dadra", "Nagar Haveli", 
-                "Andaman", "Nicobar", "Chandigarh")
-  
-  
-  states_to_filter <- switch (states,
-                       not_in_cpw1 = not_in_cpw1,
-                       small_rich = small_rich,
-                       no_vidhan = no_vidhan,
-                       all_above = c(not_in_cpw1, small_rich, no_vidhan, northeast),
-                       several = several,
-                       states
-  ) %>% 
-    bound_rx(leftbound = "", rightbound = "")
-  
+  # if(is.character(rlang::eval_tidy(states))) {
+    
+       if(length(states) > 1) {
+          several <- states
+          states <- "several"}
+        
+      if(length(states) > 1) {
+        several <- states
+        states <- "several"}
+    
+    
+      # If called from other cptools functions, they know what they should be selecting
+      if(is.na(states)) {
+        return(df)
+        }
+      
+      poor_coverage <- c("Jammu & Kashmir", "Uttarakhand")
+      
+      not_in_cpw1 = c("Arunachal Pradesh", "Nagaland",
+                      "Manipur", "Mizoram", "Tripura",
+                      "Meghalaya", "Sikkim")
+      
+      northeast <- c("Assam", not_in_cpw1)
+      
+      small_rich = c("Goa", "Delhi", "Puducherry", "Pondicherry", "Chandigarh")
+      
+      no_vidhan = c("Lakashdweep", "Daman", "Diu",  "Dadra", "Nagar Haveli", 
+                    "Andaman", "Nicobar", "Chandigarh")
+      
+      
+      states_to_filter <- switch (states,
+                           poor_coverage = poor_coverage,   
+                           not_in_cpw1 = not_in_cpw1,
+                           small_rich = small_rich,
+                           no_vidhan = no_vidhan,
+                           all_above = c(poor_coverage, not_in_cpw1, small_rich, no_vidhan, northeast),
+                           several = several,
+                           states
+      ) %>% 
+        bound_rx(leftbound = "", rightbound = "")
+      
+  # } else {
+  #   
+  #   
+  #   rlang::as_label(states)
+  #   
+  # }
   
   if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df)}
   
@@ -49,7 +66,7 @@ filter_st_name <- function(df, states,
     filter_at(df, vars(all_of(state_col_name)),
               any_vars(buscar(., exclude)))
     
-                         
+
 }
 
 
@@ -61,6 +78,7 @@ filter_st_name <- function(df, states,
 #' the name of the correct column here as a string.
 #' @param states Accepts either a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case, or the following options: 
 #' \itemize{
+#' \item{\code{"poor_coverage"}: Jammu & Kashmir and Uttarakhand because of frequent problems in maps and dataset coverage}
 #'  \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}
 #'  \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
 #'  \item{\code{"no_vidhan"}: those Union Territories without legislative assembly}

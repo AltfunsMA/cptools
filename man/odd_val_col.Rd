@@ -29,6 +29,7 @@ that will used to check.}
 
 \item{states}{Accepts either a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case, or the following options: 
 \itemize{
+\item{\code{"poor_coverage"}: Jammu & Kashmir and Uttarakhand because of frequent problems in maps and dataset coverage}
  \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}
  \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
  \item{\code{"no_vidhan"}: those Union Territories without legislative assembly}
@@ -47,6 +48,9 @@ A tibble with the rows where the odd values where found.
 Checking Columns for NA, Negative or Other (Odd) Values and Returning an
 easy to inspect dataframe with meaningful reference columns that don't have
 NAs
+}
+\details{
+The \code{states} argument calls \code{exclude_states}
 }
 \examples{
 

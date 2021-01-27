@@ -9,6 +9,8 @@ map_PDF(plot_list, folder = NULL, multiple = FALSE, nrow = 1, ncol = 1)
 \arguments{
 \item{plot_list}{A list of plots handled by gridExtra}
 
+\item{folder}{Name of subfolder if storing plots individually}
+
 \item{multiple}{Should the images be printed in multiple PDF files?}
 
 \item{nrow}{Number of rows for gridExtra::marrangeGrob}

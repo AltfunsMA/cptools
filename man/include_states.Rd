@@ -11,6 +11,7 @@ include_states(df, states, state_col_name = NULL)
 
 \item{states}{Accepts either a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case, or the following options: 
 \itemize{
+\item{\code{"poor_coverage"}: Jammu & Kashmir and Uttarakhand because of frequent problems in maps and dataset coverage}
  \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}
  \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
  \item{\code{"no_vidhan"}: those Union Territories without legislative assembly}

@@ -50,10 +50,10 @@ mismatch <- function (vector1, vector2, min_obs_for_csv = 20,
   if(dim(df)[1] > min_obs_for_csv) {write_csv(df, path = full_path)
     print(paste("File stored in ", full_path))}
 
-  cat("Dataframe dimensions are: ")
-  cat(dim(df))
-  cat(name1, "has", na2, "values without correspondence")
-  cat(name2, "has", na1, "values without correspondence")
+  cat("Dataframe dimensions are: \n")
+  cat(dim(df), "\n")
+  cat(name1, "has", na2, "values without correspondence\n")
+  cat(name2, "has", na1, "values without correspondence\n")
 
   df
 }

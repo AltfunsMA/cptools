@@ -15,6 +15,8 @@
 #' as \code{refCols}.
 #' @inheritParams exclude_states
 #' @param verbose Whether to print messages to the console.
+#' 
+#' @details The \code{states} argument calls \code{exclude_states}
 #'
 #' @return A tibble with the rows where the odd values where found.
 #' @export
@@ -39,7 +41,7 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   found_st_name <- str_to_upper(find_st_name_col(df))
   
   df_processing <- df %>% rm_list_cols() %>% 
-    {if(!is.na(found_st_name)) cptools:::filter_st_name(., states = NA) else .} %>% 
+    {if(!is.na(found_st_name)) cptools:::filter_st_name(., states = states) else .} %>% 
     rename_all(str_to_upper) %>% 
     as_tibble()
   

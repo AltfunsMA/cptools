@@ -28,7 +28,7 @@ create_india_map(
 )
 }
 \arguments{
-\item{df}{An dataframe with a simple features geometry column}
+\item{df}{A dataframe with a simple features geometry column (representing India of course)}
 
 \item{title}{The title of the plot}
 

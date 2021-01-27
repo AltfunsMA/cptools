@@ -9,7 +9,7 @@
 #' 
 #' @return The same as \code{df} with only the duplicated rows (all of them).
 #' @export
-duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ...) {
+duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ..., verbose = FALSE) {
 
 
   sfcol <- attr(df, "sf_column")
@@ -50,22 +50,23 @@ duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ...) {
     
     out  <- rbind(one_end, other_end) 
     
-  } else {out <- checking(fromLast)
+  } else {out <- checking(fromLast) }
+  
+  # Final operations
   
   if(nrow(out) < 1) {
     
-    cat("No duplicated combinations of", checkCols, "found. \n") 
+  if(verbose) cat("No duplicated combinations of", checkCols, "found. \n") 
     
     return(NULL)
-    
-  }
   
   }
-  
-  cat(nrow(out), "rows with the same combination of", 
+      
+ if(verbose) { cat(nrow(out), "rows with the same combination of", 
       checkCols[1], "and",
       checkCols[2], " \n")
-  
+ }
+   
   out %>% 
     arrange(!!!vars)
   

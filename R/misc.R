@@ -2,6 +2,28 @@
 # Alfonso Martinez Arranz
 # General utility functions and those used by other functions
 
+#' Match column classes of df before joining
+#'
+#' @param df1 
+#' @param df2 
+#'
+#' @return df2 with its shared columns (the ones with the same name) in the same class as df1
+#' @export
+#'
+#' @examples
+match_col_classes <- function(df1, df2) {
+  
+  sharedColNames <- names(df1)[names(df1) %in% names(df2)]
+  sharedColTypes <- sapply(df1[,sharedColNames], class)
+  
+  for (n in sharedColNames) {
+    class(df2[, n]) <- sharedColTypes[n]
+  }
+  
+  return(df2)
+}
+
+
 
 #' Remove list columns
 #'
@@ -12,12 +34,15 @@
 #' @export
 rm_list_cols <- function(x) {
 
+  if(!inherits(x, "data.frame")) {return(x)} 
+  
   # SF geometry will not, by design, be removed by select_if below
   if (identical(class(x)[1], "sf")) {sf::st_geometry(x) <- NULL}
 
-  if("data.frame" %in% class(x)) {x <- select_if(x, negate(is.list))}
-
-  x
+  # as_tibble allows for prettier printing, etc. and is very useful precisely in the
+  # context of sf objects
+   select_if(x, negate(is.list)) %>% 
+     as_tibble() 
 
 }
 

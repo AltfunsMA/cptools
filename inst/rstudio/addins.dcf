@@ -1,4 +1,4 @@
-Name: Insert dashes (---)
+c("something or other")s (---)
 Description: Inserts `---` at the cursor position up to 80 characters.
 Binding: set_new_chapter
 Interactive: false
@@ -11,4 +11,25 @@ Interactive: false
 Name: Update header
 Description: Inserts (and overwrites) a commented header in the current file 
 Binding: update_header
+Interactive: false
+
+Name:  Bare space combine
+Description: Turn a selection of space-separated bare strings into a base::combine statement
+Binding: bare-space-combine
+Interactive: false
+
+Name:  Bare combine
+Description: Turn a selection of comma-separated bare strings into a base::combine statement
+Binding: bare_combine
+Interactive: false
+
+
+Name:  End of line pipe
+Description: Add a pipe at the end of the line and move to the next line
+Binding: endpipe
+Interactive: false
+
+Name:  End of line plus
+Description: Add a plus sign at the end of the line and move to the next line
+Binding: endplus
 Interactive: false

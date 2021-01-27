@@ -24,14 +24,14 @@ get_supporting_maps <- function(states_to_plot, need_nation, need_states,
   
   if ("Jammu and Kashmir" %in% states_to_plot && show_disputed) {
     
-    disputed <- st_read_quiet("Processed/GADM/pok.gpkg")
+    disputed <- st_read_quiet("Processed/admin_maps/GADM/pok.gpkg")
     
   } else {disputed <- NULL}
   
   if (!exists("GADM2018_states"))
   {
     
-    GADM2018_states <<- st_read_quiet("Processed/GADM/GADM2018_states.gpkg")
+    GADM2018_states <<- st_read_quiet("Processed/admin_maps/GADM/GADM2018_states.gpkg")
   
   }
 
@@ -48,13 +48,13 @@ Plotting all states in GADM. \n")
   # Loading main datasets
   if(!exists("nation") & need_nation) 
   {
-    nation <<- st_read_quiet("Processed/GADM/GADM2018_border.gpkg")
+    nation <<- st_read_quiet("Processed/admin_maps/GADM/GADM2018_border.gpkg")
     
   } else {nation <- NULL}
   
 
   if(!exists("GADM2018_dist"))
-  {GADM2018_dist <<- st_read_quiet("Processed/GADM/GADM2018_dist.gpkg")}
+  {GADM2018_dist <<- st_read_quiet("Processed/admin_maps/GADM/GADM2018_dist.gpkg")}
   
  districts <- GADM2018_dist %>% elegir_estados()
  

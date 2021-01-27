@@ -4,7 +4,7 @@
 \alias{duplicheck}
 \title{Check for duplicates (in Consumer Pyramids and Indian election data)}
 \usage{
-duplicheck(df, checkCols = NULL, fromLast = NULL, ...)
+duplicheck(df, checkCols = NULL, fromLast = NULL, ..., verbose = FALSE)
 }
 \arguments{
 \item{df}{A dataframe, including sf, potentially containing duplicates.}

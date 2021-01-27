@@ -1,6 +1,7 @@
 #' Saving multiple plots into PDF from a list
 #'
 #' @param plot_list A list of plots handled by gridExtra 
+#' @param folder Name of subfolder if storing plots individually
 #' @param multiple Should the images be printed in multiple PDF files?
 #' @param nrow Number of rows for gridExtra::marrangeGrob
 #' @param ncol Number of columns for gridExtra::marrangeGrob
@@ -9,7 +10,6 @@
 #' in separate folder
 #' @export
 #'
-#' @examples
 map_PDF <- function(plot_list, folder = NULL, multiple = FALSE, nrow = 1, ncol = 1) {
   
   ifelse(!dir.exists("Maps_output"), dir.create("Maps_output"), FALSE)

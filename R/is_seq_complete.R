@@ -98,15 +98,24 @@ is_acno_complete <- function(df,
   
   if("year" %in% str_to_lower(colnames(df_preprocessed))) {
     
+
+    
     uni_vals <- df_preprocessed %>% 
       distinct(!!group_name, year) %>% 
       count(!!group_name)
     
     if(any(uni_vals$n > 1)) {
       
+      if(any(is.na(df_preprocessed$year))) {
+        
+        warning("NA values detected in 'Year' column. 
+                \nThis alone will trigger a 'non-unique year value per year' warning.")
+        
+      }
+      
       warning(
-        "\n Year column found with more than one unique value per group. ", 
-        "Results will be confusing/wrong if more than one year's worth of",
+        "\nYear column found with more than one unique value per group.", 
+        "\nResults will be confusing/wrong if more than one year's worth of",
         " election data per state is analysed through this function.\n")}
     
   }
