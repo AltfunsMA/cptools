@@ -4,7 +4,7 @@
 \alias{normalise}
 \title{Normalise values in a vector (default 0-1)}
 \usage{
-normalise(v, min_val, max_val)
+normalise(v, min_val = 0, max_val = 1)
 }
 \arguments{
 \item{v}{A numeric vector}

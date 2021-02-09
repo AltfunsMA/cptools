@@ -1,6 +1,6 @@
 filter_st_name <- function(df, states, 
                            exclude = TRUE, state_col_name = NULL,
-                           warn = TRUE) {
+                           warn = TRUE, df_nm = "df") {
   
   # states <- rlang::enquos(states)
   
@@ -52,7 +52,7 @@ filter_st_name <- function(df, states,
   #   
   # }
   
-  if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df)}
+  if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df, df_nm)}
   
   buscar <- function(strings, exclude) {
     
@@ -97,8 +97,10 @@ filter_st_name <- function(df, states,
 #'
 exclude_states <- function(df, states, state_col_name = NULL) {
   
+  df_nm <- deparse(substitute(df))
+  
   cptools:::filter_st_name(df = df, states = states, state_col_name = state_col_name,
-                 exclude = TRUE)
+                 exclude = TRUE, df_nm = df_nm)
   
   
 }
@@ -113,9 +115,10 @@ exclude_states <- function(df, states, state_col_name = NULL) {
 #'
 include_states <- function(df, states, state_col_name = NULL) {
   
+  df_nm <- deparse(substitute(df))
   
   cptools:::filter_st_name(df = df, states = states, state_col_name = state_col_name,
-                 exclude = FALSE)
+                 exclude = FALSE, df_nm = df_nm)
 }
   
   
@@ -131,7 +134,10 @@ include_states <- function(df, states, state_col_name = NULL) {
 
 filter_cpw1_states <- function(df, state_col_name = NULL) {
   
-  cptools:::filter_st_name(df, states = "not_in_cpw1", state_col_name = NULL)
+  df_nm <- deparse(substitute(df))
+  
+  cptools:::filter_st_name(df, states = "not_in_cpw1", state_col_name = NULL, 
+                           df_nm = df_nm)
   
 }
 

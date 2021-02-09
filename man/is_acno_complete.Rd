@@ -4,7 +4,13 @@
 \alias{is_acno_complete}
 \title{Check for gaps in AC No. sequence in Indian states}
 \usage{
-is_acno_complete(df, checkCols = NULL, comparison = `==`, step = NULL)
+is_acno_complete(
+  df,
+  checkCols = NULL,
+  comparison = `==`,
+  step = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{df}{A dataframe. The default assumes one column for state names 
@@ -20,6 +26,8 @@ the accompanying numeric sequence variable.}
 
 \item{step}{Step to be used in comparison. Defaults to the difference 
 between the first and second elements of the vector.}
+
+\item{verbose}{Should messages be reported?}
 }
 \value{
 A data frame with two AC_NO before and one after the fault 

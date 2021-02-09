@@ -9,8 +9,6 @@
 #'
 #' @return df2 with its shared columns (the ones with the same name) in the same class as df1
 #' @export
-#'
-#' @examples
 match_col_classes <- function(df1, df2) {
   
   sharedColNames <- names(df1)[names(df1) %in% names(df2)]
@@ -106,7 +104,7 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
                      by_element = FALSE) {
   
   if(!is.character(rx_var)) 
-  {stop("The supplied argument is not a character vector")}
+  {stop("Cannot build regex.", deparse(substitute(rx_var)), " is not a character vector")}
   
   rx_var <- gsub("\n", "", rx_var)
   
@@ -132,7 +130,7 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
 
   else if(grepl("(?", rx_var, fixed = T)) {
     
-    warning("Bound_rx detected lookarounds, string supplied untouched.")
+    warning("bound_rx detected lookarounds, string supplied returned untouched.")
     
     rx_var
     
@@ -207,24 +205,24 @@ restart_reattach <- function(pkg= NULL) {
 #' it will search in character columns for those containing the word "Pradesh"
 #' (Hindi for "state" or "province").
 #' @export
-find_st_name_col <- function(df) {
+find_st_name_col <- function(df, df_nm = "df") {
   
   # The two most common in order of preference
-  # This function is called to remove non-CP states
+  # This function is often called to remove non-CP states
   for (i in c("^ST_NAME$", "^STATE$")) {
    
      if (any(str_detect(names(df), regex(i, ignore_case = TRUE))))
     {
       {
-        state_vector <- str_extract(names(df), regex(i, ignore_case = TRUE))
+        st_name_col <- str_extract(names(df), regex(i, ignore_case = TRUE))
         
-        out <- state_vector[!is.na(state_vector)]
+        out <- st_name_col[!is.na(st_name_col)]
         
         if (sum(is.na(pull(df, out))) > 0)  {
-          message(
-            "State column contains NA values.",
-            "This may affect the results of other cptools functions \n"
-          )
+          
+          warning("State column ", out, " in ", df_nm, " contains NA values.",
+          " This may affect the results of cptools functions",
+          immediate. = TRUE)
           
         }
         
@@ -255,15 +253,16 @@ find_st_name_col <- function(df) {
     replace_na(FALSE) 
   
   
-  state_col_vector <- names(df_search)[cols_w_state_name]
+  st_name_col <- names(df_search)[cols_w_state_name]
   
-  if(length(state_col_vector) > 1) {
-    cat("No columns named STATE or ST_NAME found. The following columns contained 'Pradesh': \n") 
-    cat(state_col_vector, "\n", sep =", ")
-    cat(state_col_vector[1], "used.  \n")
+  if(length(st_name_col) > 1) {
+    warning("No columns named STATE or ST_NAME found.",
+            " The following columns contained 'Pradesh': \n") 
+    cat(st_name_col, "\n", sep =", ")
+    cat(st_name_col[1], "used.  \n")
   }
   
-  state_col_vector[1]
+  st_name_col[1]
   
 }
 

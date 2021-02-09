@@ -4,7 +4,7 @@
 \alias{find_st_name_col}
 \title{Find the column containing state names}
 \usage{
-find_st_name_col(df)
+find_st_name_col(df, df_nm = "df")
 }
 \arguments{
 \item{df}{A dataframe with one or more columns containing Indian state names}

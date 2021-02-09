@@ -4,7 +4,14 @@
 \alias{mismatch}
 \title{Search for Elements in Vector2 Missing from vector2 and Vice Versa}
 \usage{
-mismatch(vector1, vector2, min_obs_for_csv = 20, treatment = as.character)
+mismatch(
+  vector1,
+  vector2,
+  min_obs_for_csv = 20,
+  treatment = as.character,
+  store_file = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{vector1}{A vector for comparison with \%in\%. Geometry columns will be removed if vector originates in sf object.}
@@ -15,6 +22,10 @@ mismatch(vector1, vector2, min_obs_for_csv = 20, treatment = as.character)
 a CSV will be created under "Processed/Checks/mm_" (directory not created)}
 
 \item{treatment}{The coercing method for the vectors}
+
+\item{store_file}{Should the mismatches be stored separately}
+
+\item{verbose}{Should messages be reported?}
 }
 \value{
 A tibble with the mismatches, including missing values.

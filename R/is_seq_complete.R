@@ -63,7 +63,7 @@ is_seq_complete <- function(df, checkCols = NULL) {
 #' @param comparison A relational operator for the check, with back-ticks.
 #' @param step Step to be used in comparison. Defaults to the difference 
 #' between the first and second elements of the vector.
-#' 
+#' @param verbose Should messages be reported? 
 #' 
 #' @return A data frame with two AC_NO before and one after the fault 
 #' in the AC_NO sequence, extracted per state.
@@ -72,7 +72,8 @@ is_seq_complete <- function(df, checkCols = NULL) {
 is_acno_complete <- function(df, 
                              checkCols = NULL, 
                              comparison = `==`,
-                             step = NULL) {
+                             step = NULL,
+                             verbose = FALSE) {
   
 
   if(is.null(checkCols)) {
@@ -131,7 +132,7 @@ is_acno_complete <- function(df,
     select(-complete_seq)
   
   if(nrow(checked_by_group) < 1) {
-    cat("No missing sequences in any states. \n")
+    if(verbose) message("No missing sequences in any states. \n")
     return(invisible(NULL))
     
   }
@@ -176,11 +177,12 @@ is_acno_complete <- function(df,
     select(-rowid) %>% 
     rename_all(str_to_upper)
   
-  
+  if(verbose) {
   cat("Gaps identified at", sum(lengths(extracted)), 
       "point(s) in the AC_NO sequence(s)", 
       "of", length(extracted), "State(s). \n")
   
+  }
   
   gap_surrounds
   
