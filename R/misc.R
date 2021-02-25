@@ -2,6 +2,40 @@
 # Alfonso Martinez Arranz
 # General utility functions and those used by other functions
 
+
+
+
+#' Return a filename-friendly string with the current time with the typical defaults
+#'
+#' @param tzone OlsonName compliant string. Passed as "tzone" attribute to POSIXct object
+#' @param format sprintf compliant. Passed to \code{format}.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' 
+#' paste0("/my/path/file_from_date_", date_str())
+#' 
+date_str <- function(tzone = "Australia/Melbourne", format = "%Y%m%d_%H%M") {
+  
+  datetime <- Sys.time()
+  
+  attr(datetime, "tzone") <- tzone
+  
+  format(datetime, format)
+  
+}
+
+
+
+
+
+
+
+
+
+
 #' Match column classes of df before joining
 #'
 #' @param df1 

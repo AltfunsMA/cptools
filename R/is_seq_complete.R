@@ -99,8 +99,6 @@ is_acno_complete <- function(df,
   
   if("year" %in% str_to_lower(colnames(df_preprocessed))) {
     
-
-    
     uni_vals <- df_preprocessed %>% 
       distinct(!!group_name, year) %>% 
       count(!!group_name)
@@ -109,8 +107,8 @@ is_acno_complete <- function(df,
       
       if(any(is.na(df_preprocessed$year))) {
         
-        warning("NA values detected in 'Year' column. 
-                \nThis alone will trigger a 'non-unique year value per year' warning.")
+        warning("\nNA values detected in 'Year' column. \n",
+        "This alone will trigger a 'non-unique year value per year' warning.")
         
       }
       
@@ -144,6 +142,18 @@ is_acno_complete <- function(df,
     vector <- pull(df_ext, !!seq_name)
     
     y <- sort(vector)
+    
+    if(y[1] != 1 || y[2] != 2) {
+      
+      print(y)
+      
+      warning("Sequence of AC NOs does not start with 1, 2 results may be confusing/wrong.\n",
+              "Note to self: This function is currently dealing with a specific case in a general way. ",
+              "This should actually be an error as far as Indian AC NO checking is concerned.",
+              "Fixing this requires making is_seq_complete the main function and",
+              "not the wrapper to is_acno_complete")
+      
+      }
     
     difference_first_vs_second_position <- diff(y)[1]
     
