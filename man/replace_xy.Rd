@@ -9,9 +9,9 @@ replace_xy(tbl, vars = NULL, ending_to_keep = ".x")
 \arguments{
 \item{tbl}{A tibble or data_frame}
 
-\item{vars}{If \code{NULL}, function searches for variables with .x/.y suffixes.
+\item{vars}{By default, the function searches for variables with .x/.y suffixes.
 Alternatively, a character vector of names of variables that are duplicated
-can be provided. This Useful when operating with sf objects because 'geometry'
+can be provided. This is useful when operating with \code{sf} objects because 'geometry'
 column will throw an error with the automated search.
 These variable must be entered without .x or .y suffixes.}
 

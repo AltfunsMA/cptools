@@ -4,12 +4,12 @@
 \alias{date_str}
 \title{Return a filename-friendly string with the current time with the typical defaults}
 \usage{
-date_str(tzone = "Australia/Melbourne", format = "\%Y\%m\%d_\%H\%M")
+date_str(format = "\%Y\%m\%d_\%H\%M", tz = "Australia/Melbourne")
 }
 \arguments{
-\item{tzone}{OlsonName compliant string. Passed as "tzone" attribute to POSIXct object}
-
 \item{format}{sprintf compliant. Passed to \code{format}.}
+
+\item{tz}{OlsonName compliant string. Passed as "tzone" attribute to POSIXct object}
 }
 \value{
 

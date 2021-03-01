@@ -7,8 +7,9 @@
 rename_states(df)
 }
 \arguments{
-\item{df}{dataframe with a column containing Indian states (automatically found by \code{find_st_name_col}), potentially with 
-older names like 'Orissa', 'Pondicherry', etc.}
+\item{df}{dataframe with a column containing Indian states (automatically
+found by \code{find_st_name_col}), potentially with older names like
+'Orissa', 'Pondicherry', etc.}
 }
 \value{
 The same dataframe but with STATE/ST_NAME columm recoded

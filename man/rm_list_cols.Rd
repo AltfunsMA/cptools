@@ -2,17 +2,19 @@
 % Please edit documentation in R/misc.R
 \name{rm_list_cols}
 \alias{rm_list_cols}
-\title{Remove list columns}
+\title{Remove list columns and return a tibble}
 \usage{
 rm_list_cols(x)
 }
 \arguments{
 \item{x}{An R object with the class "data.frame"; others will be ignored and
-the original will be silently returned untouched.}
+the original will be silently returned untouched. Particularly useful for
+removing \code{sf} geometry columns which slow down operation and
+visualisation of other data in the dataframe}
 }
 \value{
 The same object as x but without the list columns
 }
 \description{
-Remove list columns
+Remove list columns and return a tibble
 }

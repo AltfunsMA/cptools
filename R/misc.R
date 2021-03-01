@@ -3,12 +3,10 @@
 # General utility functions and those used by other functions
 
 
-
-
 #' Return a filename-friendly string with the current time with the typical defaults
 #'
-#' @param tzone OlsonName compliant string. Passed as "tzone" attribute to POSIXct object
 #' @param format sprintf compliant. Passed to \code{format}.
+#' @param tz OlsonName compliant string. Passed as "tzone" attribute to POSIXct object
 #'
 #' @return
 #' @export
@@ -17,7 +15,7 @@
 #' 
 #' paste0("/my/path/file_from_date_", date_str())
 #' 
-date_str <- function(tzone = "Australia/Melbourne", format = "%Y%m%d_%H%M") {
+date_str <- function(format = "%Y%m%d_%H%M", tz = "Australia/Melbourne") {
   
   datetime <- Sys.time()
   
@@ -57,10 +55,12 @@ match_col_classes <- function(df1, df2) {
 
 
 
-#' Remove list columns
+#' Remove list columns and return a tibble
 #'
 #' @param x An R object with the class "data.frame"; others will be ignored and
-#' the original will be silently returned untouched.
+#'   the original will be silently returned untouched. Particularly useful for
+#'   removing \code{sf} geometry columns which slow down operation and
+#'   visualisation of other data in the dataframe
 #'
 #' @return The same object as x but without the list columns
 #' @export
@@ -81,12 +81,13 @@ rm_list_cols <- function(x) {
 
 #' Rename states
 #'
-#' @param df dataframe with a column containing Indian states (automatically found by \code{find_st_name_col}), potentially with 
-#' older names like 'Orissa', 'Pondicherry', etc.
+#' @param df dataframe with a column containing Indian states (automatically
+#'   found by \code{find_st_name_col}), potentially with older names like
+#'   'Orissa', 'Pondicherry', etc.
 #'
-#' @return The same dataframe but with STATE/ST_NAME columm recoded 
+#' @return The same dataframe but with STATE/ST_NAME columm recoded
 #' @export
-#'
+#' 
 rename_states <- function(df) {
   
   col <- sym(find_st_name_col(df))
@@ -305,9 +306,9 @@ find_st_name_col <- function(df, df_nm = "df") {
 #' Replace NA in .x  cols by .y cols (or vice versa) after incomplete *_join 
 #'
 #' @param tbl A tibble or data_frame
-#' @param vars If \code{NULL}, function searches for variables with .x/.y suffixes.
+#' @param vars By default, the function searches for variables with .x/.y suffixes.
 #' Alternatively, a character vector of names of variables that are duplicated
-#' can be provided. This Useful when operating with sf objects because 'geometry'
+#' can be provided. This is useful when operating with \code{sf} objects because 'geometry'
 #' column will throw an error with the automated search.
 #' These variable must be entered without .x or .y suffixes.
 #' @param ending_to_keep Choose which column suffix should be kept for rows
