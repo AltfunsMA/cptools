@@ -30,10 +30,6 @@ date_str <- function(format = "%Y%m%d_%H%M", tz = "Australia/Melbourne") {
 
 
 
-
-
-
-
 #' Match column classes of df before joining
 #'
 #' @param df1 
@@ -69,12 +65,27 @@ rm_list_cols <- function(x) {
   if(!inherits(x, "data.frame")) {return(x)} 
   
   # SF geometry will not, by design, be removed by select_if below
-  if (identical(class(x)[1], "sf")) {sf::st_geometry(x) <- NULL}
+  if (identical(class(x)[1], "sf")) {
+
+    # Remove the column and sf properties without using SF itself
+    # so that a simple function like this doesn't depend on SF with all its baggage
+    
+    # sf::st_geometry(x) <- NULL
+    
+    geom_col <- attr(x, "sf_column")
+    
+    x[geom_col] <- NULL
+    
+    attr(x, "sf_column") <- NULL
+    
+    x <- as.data.frame(x)
+    
+    }
 
   # as_tibble allows for prettier printing, etc. and is very useful precisely in the
   # context of sf objects
-   select_if(x, negate(is.list)) %>% 
-     as_tibble() 
+   dplyr::select_if(x, purrr::negate(is.list)) %>% 
+     tibble::as_tibble() 
 
 }
 
