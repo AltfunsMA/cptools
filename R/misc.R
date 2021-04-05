@@ -19,7 +19,7 @@ date_str <- function(format = "%Y%m%d_%H%M", tz = "Australia/Melbourne") {
   
   datetime <- Sys.time()
   
-  attr(datetime, "tzone") <- tzone
+  attr(datetime, "tzone") <- tz
   
   format(datetime, format)
   
