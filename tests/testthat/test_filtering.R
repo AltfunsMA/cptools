@@ -6,6 +6,11 @@ zz <- file(f, open = "wt")
 # Divert messages to that file
 sink(zz)
 
+# despite cptools no longer requiring sf package; these tests are based on sf
+# objects and many tidyverse internals need new methods supplied by sf to work
+# properly. Loading it here is the best workaround I have come up with so far.
+library(sf) 
+
 # Load samples
 sf_sample <- readRDS("~/Projects/cptools/tests/testthat/sample_sf.rds") %>% 
   mutate(ST_NAME = case_when(
@@ -18,15 +23,24 @@ sf_sample <- readRDS("~/Projects/cptools/tests/testthat/sample_sf.rds") %>%
 
 sink()
 close(zz)
-file.remove(f)
+# file.remove(f)
 
-total <- nrow(sf_sample)
-nas_vals <- sum(is.na(sf_sample$ST_NAME))
-n <- total - nas_vals
+total_rows <- nrow(sf_sample)
 
-sf_sample %>% rm_list_cols() %>% count(ST_NAME)
+nvals <- sum(is.na(sf_sample$ST_NAME))
 
-nrow(filter_st_name(sf_sample, "not_in_cpw1"))
+n <- total_rows - nvals
+                   
+test_that("Warnings about NAs appear, and that NAs are indeed removed", {
+  expect_warning(cptools:::filter_st_name(sf_sample, "not_in_cpw1"), " contains NA values.")
+  expect_equal(suppressWarnings(nrow(cptools:::filter_st_name(sf_sample, "not_in_cpw1"))), n-50)
+})
+  
+sf_sample <- filter(sf_sample, !is.na(ST_NAME))
+
+n <- sf_sample %>% 
+  filter(!is.na(ST_NAME)) %>% 
+  nrow()
 
 test_that("Filters and by implication state selection works", {
   expect_equal(nrow(cptools:::filter_st_name(sf_sample, "not_in_cpw1")), n-50)

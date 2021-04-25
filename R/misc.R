@@ -267,7 +267,7 @@ find_st_name_col <- function(df, df_nm = "df") {
         if (sum(is.na(pull(df, out))) > 0)  {
           
           warning("State column ", out, " in ", df_nm, " contains NA values.",
-          " This may affect the results of cptools functions",
+          " cptools functions will always remove/ignore those rows",
           immediate. = TRUE)
           
         }

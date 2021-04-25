@@ -8,11 +8,6 @@ is.sequential(x, comparison, step)
 }
 \arguments{
 \item{x}{A numeric vector.}
-
-\item{comparison}{A relational operator for the check, with back-ticks.}
-
-\item{step}{Step to be used in comparison. Defaults to the difference 
-between the first and second elements of the vector.}
 }
 \value{
 A logical vector

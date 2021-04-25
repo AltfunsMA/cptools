@@ -9,6 +9,11 @@ sink(zz)
 
 # Load samples
 
+# despite cptools no longer requiring sf package; these tests are based on sf
+# objects and many tidyverse internals need new methods supplied by sf to work
+# properly. Loading it here is the best workaround I have come up with so far.
+library(sf) 
+
 path <- "~/Projects/cptools/tests/testthat/"
 
 sample_sf <- readRDS(paste0(path, "sample_sf.rds"))

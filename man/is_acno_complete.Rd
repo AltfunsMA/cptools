@@ -13,27 +13,22 @@ is_acno_complete(
 )
 }
 \arguments{
-\item{df}{A dataframe. The default assumes one column for state names 
-and one column for
-AC numbers. The state column name is automatically detected and
+\item{df}{A dataframe. The default assumes one column for state names and one
+column for AC numbers. The state column name is automatically detected and
 the AC number column name assumed to be either AC_NO or ac_no.}
 
-\item{checkCols}{To override defaults, provide a character vector with 
+\item{checkCols}{To override defaults, provide a character vector with
 exactly two strings. The first names the grouping variable, and the second,
 the accompanying numeric sequence variable.}
-
-\item{comparison}{A relational operator for the check, with back-ticks.}
-
-\item{step}{Step to be used in comparison. Defaults to the difference 
-between the first and second elements of the vector.}
-
-\item{verbose}{Should messages be reported?}
 }
 \value{
-A data frame with two AC_NO before and one after the fault 
-in the AC_NO sequence, extracted per state.
+A data frame with two rows before and one after the gap in the
+  sequence, extracted by group.
 }
 \description{
-Identifies **gaps** only, if the sequence is broken
-because of a duplication, use \code{duplicheck}
+wrapper around \code{is_seq_complete} with additional checks for
+  use with (Indian) Assembly Constituency data
+
+  Identifies **gaps** only, if the sequence is broken because of a
+  duplication, use \code{duplicheck}.
 }

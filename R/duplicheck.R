@@ -13,6 +13,7 @@ duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ..., verbose = FAL
 
 
   sfcol <- attr(df, "sf_column")
+
   
   df <- rename_with(df, str_to_upper, .cols = -any_of(sfcol))
   

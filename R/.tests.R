@@ -25,10 +25,10 @@ sample_sf %>%
  filter(!is.na(ST_NAME)) %>% 
 odd_val_col("ac")
 
-is_acno_complete(sf_for_tests)
+find_acno_incomplete(sf_for_tests)
 
 #to-do: create tests for sequences
-complete <- is_acno_complete(AC_map1978)
+complete <- find_acno_incomplete(AC_map1978)
 
 stopifnot(nrow(complete) == 363)
 
