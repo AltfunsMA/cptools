@@ -5,7 +5,7 @@
 #'
 #' @return A logical vector
 #' @export
-is.sequential <- function(x, comparison, step) {
+is.sequential <- function(x, comparison = `==`, step = NULL) {
   #  TRUE for __full__ sequences where numbers are repeated
   #  FALSE for those with gaps
   #  i.e. it'll label false an entire state missing one AC_NO
@@ -154,7 +154,9 @@ find_seq_incomplete <- function(df,
     group_name <- sym(checkCols[1])
     seq_name <- sym(checkCols[2])
     
-  }
+    }
+  
+  
   
   #So warning test below works better
   df_preprocessed <- rename_all(df, str_to_lower)  %>% 
@@ -181,20 +183,27 @@ find_seq_incomplete <- function(df,
   
   
   extract_non_seq <- function(df_ext, seq_name) {
-    # Only works if the first two values have the correct difference in the sequence  
+    # Only works if the first two values have the correct 
+    # difference in the sequence  
+    
     vector <- pull(df_ext, !!seq_name)
     
     y <- sort(vector)
     
-    if(y[1] != 1 || y[2] != 2) {
+    if(is.null(step)) {
+      
+      step <- (y[2] - y[1])
+      
+      message("Step defaulting to ", step)
+      
+    }
+    
+    if((y[2] - y[1]) != step) {
       
       print(y)
       
-      warning("Sequence of AC NOs does not start with 1, 2 results may be confusing/wrong.\n",
-              "Note to self: This function is currently dealing with a specific case in a general way. ",
-              "This should actually be an error as far as Indian AC NO checking is concerned.",
-              "Fixing this requires making find_seq_incomplete the main function and",
-              "not the wrapper to find_acno_incomplete")
+      warning("Sequence of does not start with the provided step value of", step, 
+              "Results will be unreliable.")
       
       }
     

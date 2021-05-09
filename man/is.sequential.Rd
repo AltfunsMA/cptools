@@ -4,7 +4,7 @@
 \alias{is.sequential}
 \title{Check whether there are different steps between the elements of a vector}
 \usage{
-is.sequential(x, comparison, step)
+is.sequential(x, comparison = `==`, step = NULL)
 }
 \arguments{
 \item{x}{A numeric vector.}
