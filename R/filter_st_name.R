@@ -45,12 +45,7 @@ filter_st_name <- function(df, states,
       ) %>% 
         bound_rx(leftbound = "", rightbound = "")
       
-  # } else {
-  #   
-  #   
-  #   rlang::as_label(states)
-  #   
-  # }
+
   
   if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df, df_nm)}
   
@@ -63,8 +58,8 @@ filter_st_name <- function(df, states,
     }
     
 
-    filter_at(df, vars(all_of(state_col_name)),
-              any_vars(buscar(., exclude)))
+    dplyr::filter_at(df, dplyr::vars(dplyr::all_of(state_col_name)),
+              dplyr::any_vars(buscar(., exclude)))
     
 
 }

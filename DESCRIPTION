@@ -12,8 +12,14 @@ Description: This package attaches some convenience wrappers and test functions
 License: MIT License
 Encoding: UTF-8
 LazyData: true
-Depends:
-   tidyverse
+Imports:
+   dplyr,
+   purrr,
+   stringi,
+   tidyr,
+   tibble,
+   readr,
+   magrittr
 RoxygenNote: 7.1.1
 Suggests: 
     testthat, sf

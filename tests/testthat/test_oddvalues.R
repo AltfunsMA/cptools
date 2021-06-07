@@ -2,7 +2,7 @@ context("Odd value identification tests")
 
 
 sf_sample <- readRDS("~/Projects/cptools/tests/testthat/sample_sf.rds") %>% 
-  mutate(ST_NAME = ifelse(is.na(ST_NAME), "Madhya Pradesh", ST_NAME))
+  dplyr::mutate(ST_NAME = ifelse(is.na(ST_NAME), "Madhya Pradesh", ST_NAME))
 
 # Open a file to send messages to
 f <- "messages.Rout"
@@ -14,7 +14,7 @@ dist_refs <- odd_val_col(sf_sample, "dist")
 ac_refs <- odd_val_col(sf_sample, "ac")
 
 
-x <- map_dfc(mtcars, ~recode(.x, c(`0` = -4)))
+x <- purrr::map_dfc(mtcars, ~dplyr::recode(.x, c(`0` = -4)))
 neg <- odd_val_col(x, oddValues = "negative")
 
 

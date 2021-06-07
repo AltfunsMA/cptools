@@ -43,6 +43,7 @@ is.sequential <- function(x, comparison = `==`, step = NULL) {
 #'   sequence, extracted by group. If no gaps found, NULL invisibly.
 #'
 #' @export
+#' @importFrom magrittr %>%
 #' 
 find_acno_incomplete <- function(df, checkCols = NULL,
                              comparison = `==`,
@@ -52,7 +53,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
   
   if(is.null(checkCols)) {
     
-    group_name <- find_st_name_col(df) %>% str_to_lower() %>% sym()
+    group_name <- find_st_name_col(df) %>% tolower() %>% sym()
     
     seq_name <- sym("ac_no")
     
@@ -60,7 +61,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
   
   else {
     
-    checkCols <- str_to_lower(checkCols)
+    checkCols <- tolower(checkCols)
     
     group_name <- sym(checkCols[1])
     seq_name <- sym(checkCols[2])
@@ -68,15 +69,15 @@ find_acno_incomplete <- function(df, checkCols = NULL,
   }
   
   #So warning test below works better
-  df_preprocessed <- rename_all(df, str_to_lower)  %>% 
-    filter(!is.na(!!group_name)) %>% # Trying to fill in gaps in **known** st_names
+  df_preprocessed <- dplyr::rename_all(df, tolower)  %>% 
+    dplyr::filter(!is.na(!!group_name)) %>% # Trying to fill in gaps in **known** st_names
     rm_list_cols()
   
-  if("year" %in% str_to_lower(colnames(df_preprocessed))) {
+  if("year" %in% tolower(colnames(df_preprocessed))) {
     
     uni_vals <- df_preprocessed %>% 
-      distinct(!!group_name, year) %>% 
-      count(!!group_name)
+      dplyr::distinct(!!group_name, year) %>% 
+      dplyr::count(!!group_name)
     
     if(any(uni_vals$n > 1)) {
       
@@ -123,6 +124,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
 #' before and one after the gap in the sequence, extracted by group. 
 #' If no gaps found, NULL invisibly.
 #' @export
+#' @import dplyr
 
 find_seq_incomplete <- function(df, 
                              checkCols = NULL, 
@@ -149,7 +151,7 @@ find_seq_incomplete <- function(df,
     
     }  else {
     
-    checkCols <- str_to_lower(checkCols)
+    checkCols <- tolower(checkCols)
     
     group_name <- sym(checkCols[1])
     seq_name <- sym(checkCols[2])
@@ -159,7 +161,7 @@ find_seq_incomplete <- function(df,
   
   
   #So warning test below works better
-  df_preprocessed <- rename_all(df, str_to_lower)  %>% 
+  df_preprocessed <- rename_all(df, tolower)  %>% 
     filter(!is.na(!!group_name)) %>% # Trying to fill in gaps in **known** st_names
     rm_list_cols()
   
@@ -171,7 +173,7 @@ find_seq_incomplete <- function(df,
     mutate(complete_seq = is.sequential(!!seq_name, comparison, step)) %>%
     ungroup() %>% 
     filter(complete_seq == FALSE) %>% 
-    rowid_to_column() %>% 
+    tibble::rowid_to_column() %>% 
     select(-complete_seq)
   
   if(nrow(checked_by_group) < 1) {
@@ -219,13 +221,13 @@ find_seq_incomplete <- function(df,
     # Split by state so that only one full ac_no sequence is passed
     # to the extractor function
     split(pull(checked_by_group, !!group_name), drop = TRUE) %>% 
-    map(~extract_non_seq(.x, seq_name)) %>% 
-    keep(~length(.x) > 0)
+    purrr::map(~extract_non_seq(.x, seq_name)) %>% 
+    purrr::keep(~length(.x) > 0)
   
   group_str <- rlang::expr_text(group_name)
   seq_str <- rlang::expr_text(seq_name)
   
-  before_gap_id <- map_dfr(extracted, .id = group_str, as_tibble) %>% 
+  before_gap_id <- purrr::map_dfr(extracted, .id = group_str, tibble::as_tibble) %>% 
     rename(!!seq_name := "value") %>% 
     left_join(mutate_if(checked_by_group, is.factor, as.character), 
               by = c(group_str, seq_str)) %>% 
@@ -237,7 +239,7 @@ find_seq_incomplete <- function(df,
              rowid %in% before_gap_id | 
              rowid %in% (before_gap_id + 1)) %>% 
     select(-rowid) %>% 
-    rename_all(str_to_upper)
+    rename_all(toupper)
   
   if(verbose) {
   cat("Gaps identified at", sum(lengths(extracted)), 

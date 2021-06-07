@@ -9,13 +9,14 @@
 #' 
 #' @return The same as \code{df} with only the duplicated rows (all of them).
 #' @export
+#' @importFrom magrittr %>%
 duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ..., verbose = FALSE) {
 
 
   sfcol <- attr(df, "sf_column")
 
   
-  df <- rename_with(df, str_to_upper, .cols = -any_of(sfcol))
+  df <- dplyr::rename_with(df, toupper, .cols = -any_of(sfcol))
   
   
   if (is.null(checkCols)) {
@@ -25,19 +26,19 @@ duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ..., verbose = FAL
     
     }  else {checkCols <- c("STATE", "AC_NO")}
   
-    } else {checkCols <- str_to_upper(checkCols) }
+    } else {checkCols <- toupper(checkCols) }
 
   
   vars <- syms(checkCols)
   
   minimum_distinct <- df %>% 
     rm_list_cols() %>% 
-    select(!!! checkCols)
+    dplyr::select(!!! checkCols)
   
   checking <- function(option) {
     
     df %>% 
-      filter(duplicated(minimum_distinct, fromLast = option, ...))
+      dplyr::filter(duplicated(minimum_distinct, fromLast = option, ...))
     
   }
   
@@ -69,6 +70,6 @@ duplicheck <- function(df, checkCols = NULL, fromLast = NULL, ..., verbose = FAL
  }
    
   out %>% 
-    arrange(!!!vars)
+    dplyr::arrange(!!!vars)
   
 }

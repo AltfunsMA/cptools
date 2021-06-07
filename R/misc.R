@@ -110,7 +110,7 @@ rename_states <- function(df) {
                     "Himachal Pradeshh" = "Himachal Pradesh",
                     "Orissa" = "Odisha",
                     "Pondicherry" = "Puducherry",
-                    "Jammu and Kashmir" = "Jammu & Kashmir")
+                    "Jammu & Kashmir" = "Jammu and Kashmir")
   
   delhi <- function(v) {
     
@@ -183,13 +183,12 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
   }
   
   
-  else if(grepl("\\|", rx_var)) 
+  else if(grepl("\\|", rx_var)) {
     
-  { stringr::str_replace_all(rx_var,  stringr::fixed(c("|" = "\\b|\\b",
-                                                       "(" = "(\\b",
-                                                       ")" = "\\b)")
-  )
-  )
+    
+    stringi::stri_replace_all_fixed(rx_var,
+                                    c("|", "(", ")"),
+                                    c("\\b|\\b", "(\\b", "\\b)"))
   }
   
   
@@ -257,14 +256,14 @@ find_st_name_col <- function(df, df_nm = "df") {
   # This function is often called to remove non-CP states
   for (i in c("^ST_NAME$", "^STATE$")) {
    
-     if (any(str_detect(names(df), regex(i, ignore_case = TRUE))))
+     if (any(grepl(i, names(df), ignore.case = TRUE)))
     {
       {
-        st_name_col <- str_extract(names(df), regex(i, ignore_case = TRUE))
+        st_name_col <- stringi::stri_extract_first_regex(names(df), i, case_insensitive=TRUE)
         
         out <- st_name_col[!is.na(st_name_col)]
         
-        if (sum(is.na(pull(df, out))) > 0)  {
+        if (sum(is.na(dplyr::pull(df, out))) > 0)  {
           
           warning("State column ", out, " in ", df_nm, " contains NA values.",
           " cptools functions will always remove/ignore those rows",
@@ -285,18 +284,18 @@ find_st_name_col <- function(df, df_nm = "df") {
   
   df_search <- df %>%
     rm_list_cols() %>%
-    mutate_if(is.factor, as.character) %>%
-    select_if(is.character)
+    dplyr::mutate_if(is.factor, as.character) %>%
+    dplyr::select_if(is.character)
   
   rm(df)
   
-  cols_w_state_name <- map_lgl(df_search,
-                               ~any(str_detect(.x, regex(sample_state_name,
-                                                         ignore_case = TRUE))
+  cols_w_state_name <- purrr::map_lgl(df_search,
+                               ~any(grepl(sample_state_name, .x,
+                                          ignore.case = TRUE)
                                )
   ) %>% 
     # the "select_if" above also returns columns that are all NAs
-    replace_na(FALSE) 
+    tidyr::replace_na(FALSE) 
   
   
   st_name_col <- names(df_search)[cols_w_state_name]
@@ -327,6 +326,8 @@ find_st_name_col <- function(df, df_nm = "df") {
 #'
 #' @return A tibble with merged columns
 #' @export
+#' @importFrom magrittr %>% 
+#' 
 replace_xy <- function(tbl, vars = NULL, ending_to_keep = ".x"){
 
   # Generate a character vector with only variable names that need to be 
@@ -336,7 +337,7 @@ replace_xy <- function(tbl, vars = NULL, ending_to_keep = ".x"){
     vars <- tbl %>%
       rm_list_cols() %>% 
       dplyr::select(dplyr::contains(ending_to_keep)) %>%
-      dplyr::rename_all(~stringr::str_replace(., stringr::fixed(ending_to_keep), "")) %>%
+      dplyr::rename_all(~stringi::stri_replace_all_fixed(., ending_to_keep, "")) %>%
       colnames() %>%
       unique()
 
@@ -368,10 +369,10 @@ replace_xy <- function(tbl, vars = NULL, ending_to_keep = ".x"){
   
     tbl <- tbl %>%
       # Coalesce throws errors when types are different
-      mutate_if(is.factor, as.character) %>% 
-      mutate(!!sym(var) := dplyr::coalesce(!!sym(var_transfer),
+      dplyr::mutate_if(is.factor, as.character) %>% 
+      dplyr::mutate(!!sym(var) := dplyr::coalesce(!!sym(var_transfer),
                              !!sym(var_eliminate))) %>%
-      dplyr::select(-all_of(c(var_transfer, var_eliminate)))
+      dplyr::select(-dplyr::all_of(c(var_transfer, var_eliminate)))
   }
   
     tbl

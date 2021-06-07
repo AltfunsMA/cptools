@@ -44,7 +44,7 @@ map_PDF <- function(plot_list, folder = NULL, multiple = FALSE, nrow = 1, ncol =
       tryCatch(ggplot2::ggsave(filename = fullpath, plot = i),
                error = function(cond) {
                  message(cond)
-                 write_lines(cond, str_replace(fullpath, "\\.pdf$", ".txt"))
+                 readr::write_lines(cond, stringi::stri_replace(fullpath, "\\.pdf$", ".txt"))
                  })
       
     }

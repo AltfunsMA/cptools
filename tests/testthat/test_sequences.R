@@ -18,15 +18,15 @@ library(sf)
 
 # Load samples
 sample_sf <- readRDS("~/Projects/cptools/tests/testthat/sample_sf.rds") %>% 
-  filter(!is.na(ST_NAME))  # These NAs should yield a warning that is tested in filtering...
+  dplyr::filter(!is.na(ST_NAME))  # These NAs should yield a warning that is tested in filtering...
 
 sample_df <- sample_sf %>% 
-  st_set_geometry(NULL) %>%
-  rename(group_name = ST_NAME, broken_seq = AC_NO, non_broken_seq = PC_ID)
+  sf::st_set_geometry(NULL) %>%
+  dplyr::rename(group_name = ST_NAME, broken_seq = AC_NO, non_broken_seq = PC_ID)
   
 
 warned <- sample_sf %>% 
-  mutate(year = ifelse(AC_NO > 50, "2000", "2005"))
+  dplyr::mutate(year = ifelse(AC_NO > 50, "2000", "2005"))
 
 standard <- nrow(find_acno_incomplete(sample_sf))
 

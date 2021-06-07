@@ -53,13 +53,13 @@ custom_read <- function(file_string, matched_file, extension, verbose) {
   }
   
     switch(extension,
-           ".csv" = assign(file_string, read_csv(matched_file, col_types = cols()), 
+           ".csv" = assign(file_string, readr::read_csv(matched_file, col_types = readr::cols()), 
                            envir = .GlobalEnv),
-           ".gpkg" = assign(file_string, st_read(matched_file, quiet = TRUE), 
+           ".gpkg" = assign(file_string, sf::st_read(matched_file, quiet = TRUE), 
                             envir = .GlobalEnv),
-           ".shp" = assign(file_string, st_read(matched_file, quiet = TRUE), 
+           ".shp" = assign(file_string, sf::st_read(matched_file, quiet = TRUE), 
                            envir = .GlobalEnv),
-           ".rds" = assign(file_string, read_rds(matched_file), 
+           ".rds" = assign(file_string, readRDS(matched_file), 
                            envir = .GlobalEnv)
     )
 

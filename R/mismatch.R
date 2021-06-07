@@ -26,10 +26,12 @@ mismatch <- function (vector1, vector2, min_obs_for_csv = 20,
   name2 <- deparse(substitute(vector2))
 
   full_path <- create_full_path("Checks",
-                                paste0("mm_", str_sub(name1, 1, 4),
-                                       str_sub(name1, -3, -1),
+                                paste0("mm_", 
+                                       stringi::stri_sub(name1, 1, 4),
+                                       stringi::stri_sub(name1, -3, -1),
                                        ".v.",
-                                       str_sub(name2, 1, 4), str_sub(name2, -3, -1)),
+                                       stringi::stri_sub(name2, 1, 4),
+                                       stringi::stri_sub(name2, -3, -1)),
                                 ".csv")
 
   x <- treatment(vector1)
@@ -60,7 +62,7 @@ mismatch <- function (vector1, vector2, min_obs_for_csv = 20,
   if(dim(df)[1] > min_obs_for_csv) {
     
     if(store_file) {
-    write_csv(df, path = full_path)
+    write.csv(df, path = full_path)
     print(paste("File stored in ", full_path))
     }
     

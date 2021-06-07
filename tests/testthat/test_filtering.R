@@ -13,11 +13,11 @@ library(sf)
 
 # Load samples
 sf_sample <- readRDS("~/Projects/cptools/tests/testthat/sample_sf.rds") %>% 
-  mutate(ST_NAME = case_when(
+  dplyr::mutate(ST_NAME = dplyr::case_when(
     ST_NAME == "Andhra Pradesh" & AC_NO < 50 ~ 'Delhi',
-    ST_NAME == "Andhra Pradesh" & between(AC_NO, 50, 100) ~ 'Daman and Diu',
-    ST_NAME == "Andhra Pradesh" & between(AC_NO, 100, 150) ~ 'Chandigarh',
-    ST_NAME == "Andhra Pradesh" & between(AC_NO, 150, 200) ~ 'Manipur',
+    ST_NAME == "Andhra Pradesh" & dplyr::between(AC_NO, 50, 100) ~ 'Daman and Diu',
+    ST_NAME == "Andhra Pradesh" & dplyr::between(AC_NO, 100, 150) ~ 'Chandigarh',
+    ST_NAME == "Andhra Pradesh" & dplyr::between(AC_NO, 150, 200) ~ 'Manipur',
     TRUE ~ as.character(ST_NAME))
     )
 
@@ -36,10 +36,10 @@ test_that("Warnings about NAs appear, and that NAs are indeed removed", {
   expect_equal(suppressWarnings(nrow(cptools:::filter_st_name(sf_sample, "not_in_cpw1"))), n-50)
 })
   
-sf_sample <- filter(sf_sample, !is.na(ST_NAME))
+sf_sample <- dplyr::filter(sf_sample, !is.na(ST_NAME))
 
 n <- sf_sample %>% 
-  filter(!is.na(ST_NAME)) %>% 
+  dplyr::filter(!is.na(ST_NAME)) %>% 
   nrow()
 
 test_that("Filters and by implication state selection works", {

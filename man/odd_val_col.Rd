@@ -57,4 +57,5 @@ The \code{states} argument calls \code{exclude_states}
 x <- na_if(mtcars, 0)
 
 odd_val_col(x)
+
 }

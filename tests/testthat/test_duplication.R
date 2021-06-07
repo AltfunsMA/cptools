@@ -34,16 +34,16 @@ iris_half <- duplicheck(iris, checkCols = c("Sepal.Length", "Species"),
 
 # Hard to make-up a dataset that will serve this purpose
 repxy <- sample_sf %>%
-  mutate_if(is.factor, as.character) %>% 
-  left_join(dobles_in_map, 
+  dplyr::mutate_if(is.factor, as.character) %>% 
+  dplyr::left_join(dobles_in_map, 
             by = c("ST_NAME", "AC_NO", "DIST_NAME", "PC_NAME")) %>%
   replace_xy() %>%
-  mutate(ST_NAME = case_when(
+  dplyr::mutate(ST_NAME = dplyr::case_when(
     is.na(ST_NAME) ~ NEW_ST_NAME,
     ST_NAME != NEW_ST_NAME ~ NEW_ST_NAME,
     TRUE ~ ST_NAME
   )) %>%
-  select(-NEW_ST_NAME)
+  dplyr::select(-NEW_ST_NAME)
                     
 
 sink()

@@ -20,12 +20,14 @@
 #'
 #' @return A tibble with the rows where the odd values where found.
 #' @export
+#' @import dplyr
 #'
 #' @examples
 #'
 #' x <- na_if(mtcars, 0)
 #'
 #' odd_val_col(x)
+#' 
 odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
                         states = NA, verbose = TRUE) {
   
@@ -38,12 +40,12 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   }
 
   
-  found_st_name <- str_to_upper(find_st_name_col(df))
+  found_st_name <- toupper(find_st_name_col(df))
   
   df_processing <- df %>% rm_list_cols() %>% 
     {if(!is.na(found_st_name)) cptools:::filter_st_name(., states = states) else .} %>% 
-    rename_all(str_to_upper) %>% 
-    as_tibble()
+    rename_all(toupper) %>% 
+    tibble::as_tibble()
   
   
   
@@ -57,7 +59,7 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   
   
   # Selecting options
-  oddValues <- str_to_lower(oddValues)
+  oddValues <- tolower(oddValues)
   
   neg_val_optns <- c("negative", "negatives", "neg")
   
@@ -96,7 +98,7 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   # Select **columns** with oddvals and attach to reference columns
   na_cols <- df_processing %>% 
     {if(oddValues[1] == 0) select_if(., is.numeric) else . } %>% 
-    select_if(map_lgl(., ~any(comparison_fun(.x, oddValues))))
+    select_if(purrr::map_lgl(., ~any(comparison_fun(.x, oddValues))))
   
 
   if(length(na_cols) < 1) {
@@ -130,7 +132,7 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   if(verbose) {
   
   cat("Found in", nrow(out_df), "rows across these columns: \n",
-      str_c(names(na_cols), collapse = ", "), ". \n\n",
+      paste0(names(na_cols), collapse = ", "), ". \n\n",
       "First", min(10, nrow(out_df)), "rows listed by unique values in reference columns: \n")
   
   max_row_out <- min(10, nrow(out_df)) 
