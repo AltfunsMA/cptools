@@ -58,8 +58,7 @@ filter_st_name <- function(df, states,
     }
     
 
-    dplyr::filter_at(df, dplyr::vars(dplyr::all_of(state_col_name)),
-              dplyr::any_vars(buscar(., exclude)))
+    dplyr::filter(df, if_any(all_of(state_col_name), ~buscar(., exclude)))
     
 
 }

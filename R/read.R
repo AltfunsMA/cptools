@@ -53,7 +53,7 @@ custom_read <- function(file_string, matched_file, extension, verbose) {
   }
   
     switch(extension,
-           ".csv" = assign(file_string, readr::read_csv(matched_file, col_types = readr::cols()), 
+           ".csv" = assign(file_string, data.table::fread(matched_file), 
                            envir = .GlobalEnv),
            ".gpkg" = assign(file_string, sf::st_read(matched_file, quiet = TRUE), 
                             envir = .GlobalEnv),

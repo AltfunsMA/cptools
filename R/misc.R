@@ -84,7 +84,7 @@ rm_list_cols <- function(x) {
 
   # as_tibble allows for prettier printing, etc. and is very useful precisely in the
   # context of sf objects
-   dplyr::select_if(x, purrr::negate(is.list)) %>% 
+   dplyr::select(x, where(Negate(is.list))) %>% 
      tibble::as_tibble() 
 
 }
@@ -284,8 +284,8 @@ find_st_name_col <- function(df, df_nm = "df") {
   
   df_search <- df %>%
     rm_list_cols() %>%
-    dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::select_if(is.character)
+    dplyr::mutate(across(where(is.factor), as.character)) %>%
+    dplyr::select(where(is.character))
   
   rm(df)
   

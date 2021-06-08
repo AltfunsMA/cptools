@@ -20,7 +20,7 @@
 #'
 #' @return A tibble with the rows where the odd values where found.
 #' @export
-#' @import dplyr
+#' @import tidytable
 #'
 #' @examples
 #'
@@ -44,7 +44,7 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   
   df_processing <- df %>% rm_list_cols() %>% 
     {if(!is.na(found_st_name)) cptools:::filter_st_name(., states = states) else .} %>% 
-    rename_all(toupper) %>% 
+    rename_with(toupper) %>% 
     tibble::as_tibble()
   
   
@@ -124,7 +124,7 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
   
   # Filter **rows** with oddvals
   out_df <- na_ref_cols %>%
-    filter_all(any_vars(comparison_fun(., oddValues))) %>% 
+    filter(if_any(everything(), ~comparison_fun(., oddValues))) %>% 
     distinct()
   
   

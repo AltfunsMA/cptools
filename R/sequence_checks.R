@@ -69,7 +69,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
   }
   
   #So warning test below works better
-  df_preprocessed <- dplyr::rename_all(df, tolower)  %>% 
+  df_preprocessed <- dplyr::rename_with(df, tolower)  %>% 
     dplyr::filter(!is.na(!!group_name)) %>% # Trying to fill in gaps in **known** st_names
     rm_list_cols()
   
@@ -124,7 +124,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
 #' before and one after the gap in the sequence, extracted by group. 
 #' If no gaps found, NULL invisibly.
 #' @export
-#' @import dplyr
+#' @import tidytable
 
 find_seq_incomplete <- function(df, 
                              checkCols = NULL, 
@@ -161,7 +161,7 @@ find_seq_incomplete <- function(df,
   
   
   #So warning test below works better
-  df_preprocessed <- rename_all(df, tolower)  %>% 
+  df_preprocessed <- rename_with(df, tolower)  %>% 
     filter(!is.na(!!group_name)) %>% # Trying to fill in gaps in **known** st_names
     rm_list_cols()
   
@@ -239,7 +239,7 @@ find_seq_incomplete <- function(df,
              rowid %in% before_gap_id | 
              rowid %in% (before_gap_id + 1)) %>% 
     select(-rowid) %>% 
-    rename_all(toupper)
+    rename_with(toupper)
   
   if(verbose) {
   cat("Gaps identified at", sum(lengths(extracted)), 
