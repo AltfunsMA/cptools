@@ -20,7 +20,7 @@
 #'
 #' @return A tibble with the rows where the odd values where found.
 #' @export
-#' @import tidytable
+#' @import dplyr
 #'
 #' @examples
 #'

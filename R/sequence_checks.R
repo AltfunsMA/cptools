@@ -124,7 +124,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
 #' before and one after the gap in the sequence, extracted by group. 
 #' If no gaps found, NULL invisibly.
 #' @export
-#' @import tidytable
+#' @import dplyr
 
 find_seq_incomplete <- function(df, 
                              checkCols = NULL, 

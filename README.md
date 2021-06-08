@@ -1,5 +1,5 @@
 # cptools
-A package for processing Indian elections and [Consumer Pyramids](https://consumerpyramidsdx.cmie.com/) data. It is updated to use the fast yet friendly [tidytable](https://github.com/markfairbanks/tidytable/).
+A package for processing Indian elections and [Consumer Pyramids](https://consumerpyramidsdx.cmie.com/) data. It currently uses [tidyverse](www.tidyverse.org) functions and will soon be updated to take advantage of the ultra-fast yet user-friendly [tidytable](https://github.com/markfairbanks/tidytable/) rendering
 
 ## Why use it
 cptools provides a few simple convenience functions for operating on dataframes containing Indian administrative divisions:
