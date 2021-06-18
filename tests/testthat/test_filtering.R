@@ -32,8 +32,8 @@ nvals <- sum(is.na(sf_sample$ST_NAME))
 n <- total_rows - nvals
                    
 test_that("Warnings about NAs appear, and that NAs are indeed removed", {
-  expect_warning(cptools:::filter_st_name(sf_sample, "not_in_cpw1"), " contains NA values.")
-  expect_equal(suppressWarnings(nrow(cptools:::filter_st_name(sf_sample, "not_in_cpw1"))), n-50)
+  expect_warning(exclude_states(sf_sample, "not_in_cpw1"), " contains NA values.")
+  expect_equal(suppressWarnings(nrow(exclude_states(sf_sample, "not_in_cpw1"))), n-50)
 })
   
 sf_sample <- dplyr::filter(sf_sample, !is.na(ST_NAME))
@@ -42,14 +42,30 @@ n <- sf_sample %>%
   dplyr::filter(!is.na(ST_NAME)) %>% 
   nrow()
 
+test_that("Null or empty vector selection returns an empty df with a warning",
+          {expect_warning(include_states(sf_sample, character()))
+          expect_warning(include_states(sf_sample, NULL))
+          expect_equal(nrow(suppressWarnings(exclude_states(sf_sample, NULL))), 0)
+            })
+
 test_that("Filters and by implication state selection works", {
-  expect_equal(nrow(cptools:::filter_st_name(sf_sample, "not_in_cpw1")), n-50)
-  expect_equal(nrow(cptools:::filter_st_name(sf_sample, "Gujarat")), (n-178))
-  expect_equal(nrow(exclude_states(sf_sample, "no_vidhan")), n-50-51)
+  expect_error(exclude_states(mtcars, "tamil"), "No column")
+  expect_equal(nrow(exclude_states(sf_sample, no_vidhan)), n-50-51)
   expect_equal(nrow(exclude_states(sf_sample, "not_in_cpw1")), n-50)
-  expect_equal(nrow(include_states(sf_sample, "Gujarat")), (178))
+  expect_equal(nrow(include_states(sf_sample, Gujarat)), (178))
   expect_equal(nrow(include_states(sf_sample, "no_vidhan")), 101)
   expect_equal(nrow(filter_cpw1_states(sf_sample)), n-50)
   expect_error(include_states(sf_sample))
   expect_error(exclude_states(sf_sample))
+})
+
+
+test_that("Different types of input yield the same output", {
+  expect_equal(exclude_states(sf_sample, "small_rich"),
+               exclude_states(sf_sample, small_rich))
+  expect_equal(exclude_states(sf_sample, "Guj"),
+               exclude_states(sf_sample, guj))
+  expect_equal(exclude_states(sf_sample, mtcars, "Guj", "small_rich"),
+               exclude_states(sf_sample, mtcars, Guj, small_rich))
+
 })

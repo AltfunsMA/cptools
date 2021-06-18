@@ -7,31 +7,29 @@
 mismatch(
   vector1,
   vector2,
-  min_obs_for_csv = 20,
-  treatment = as.character,
-  store_file = FALSE,
-  verbose = FALSE
+  min_obs_for_csv = NULL,
+  folder = "mismatch",
+  treatment = as.character
 )
 }
 \arguments{
-\item{vector1}{A vector for comparison with \%in\%. Geometry columns will be removed if vector originates in sf object.}
+\item{vector1}{A vector for comparison with \%in\%. Geometry columns will be
+removed if vector originates in sf object.}
 
 \item{vector2}{As for vector1}
 
-\item{min_obs_for_csv}{If no. of mismatches is above this number,
-a CSV will be created under "Processed/Checks/mm_" (directory not created)}
+\item{min_obs_for_csv}{If NULL, output only to console. An integer value
+indicates the minimum number of mismatched observations for the output to
+be stored in a file in the folder given below.}
 
 \item{treatment}{The coercing method for the vectors}
-
-\item{store_file}{Should the mismatches be stored separately}
-
-\item{verbose}{Should messages be reported?}
 }
 \value{
 A tibble with the mismatches, including missing values.
 }
 \description{
-This function is intended to offer a quick visualisation of which districts or others are missing in Consumer Pyramids data.
+This function is intended to offer a quick visualisation of
+  which elements are missing across two vectors.
 }
 \examples{
 mismatch(iris$Species, iris$Species)

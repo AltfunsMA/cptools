@@ -1,14 +1,15 @@
 #' Search for Elements in Vector2 Missing from vector2 and Vice Versa
 #'
-#' @description This function is intended to offer a quick visualisation of which districts or others are missing in Consumer Pyramids data.
+#' @description This function is intended to offer a quick visualisation of
+#'   which elements are missing across two vectors.
 #'
-#' @param vector1 A vector for comparison with \%in\%. Geometry columns will be removed if vector originates in sf object.
+#' @param vector1 A vector for comparison with \%in\%. Geometry columns will be
+#'   removed if vector originates in sf object.
 #' @param vector2 As for vector1
-#' @param min_obs_for_csv If no. of mismatches is above this number,
-#' a CSV will be created under "Processed/Checks/mm_" (directory not created)
+#' @param min_obs_for_csv If NULL, output only to console. An integer value
+#'   indicates the minimum number of mismatched observations for the output to
+#'   be stored in a file in the folder given below.
 #' @param treatment The coercing method for the vectors
-#' @param store_file Should the mismatches be stored separately
-#' @param verbose Should messages be reported?
 #'
 #' @return A tibble with the mismatches, including missing values.
 #' @export
@@ -17,22 +18,11 @@
 #' mismatch(iris$Species, iris$Species)
 #'
 #' # Currently gives one NA value if all correct.
-mismatch <- function (vector1, vector2, min_obs_for_csv = 20,
-                      treatment = as.character,
-                      store_file = FALSE,
-                      verbose = FALSE) {
+mismatch <- function(vector1, vector2, 
+                      min_obs_for_csv = NULL,
+                      folder = "mismatch",
+                      treatment = as.character) {
 
-  name1 <- deparse(substitute(vector1)) # extract name for meaningful filename/colnames
-  name2 <- deparse(substitute(vector2))
-
-  full_path <- create_full_path("Checks",
-                                paste0("mm_", 
-                                       stringi::stri_sub(name1, 1, 4),
-                                       stringi::stri_sub(name1, -3, -1),
-                                       ".v.",
-                                       stringi::stri_sub(name2, 1, 4),
-                                       stringi::stri_sub(name2, -3, -1)),
-                                ".csv")
 
   x <- treatment(vector1)
   y <- treatment(vector2)
@@ -46,7 +36,7 @@ mismatch <- function (vector1, vector2, min_obs_for_csv = 20,
 
   if(maxlength == 0) {
     
-    if(verbose) ("No different values found \n")
+    message("No different values found \n")
     
     return(NULL)
     
@@ -56,25 +46,34 @@ mismatch <- function (vector1, vector2, min_obs_for_csv = 20,
 
   na1 <- sum(is.na(df[1]))
   na2 <- sum(is.na(df[2]))
+  
+  
+  name1 <- deparse(substitute(vector1))
+  name2 <- deparse(substitute(vector2))
 
-  colnames(df) <- c(name1, name2)
+  colnames(df) <- c(paste(name1, "missing in", name2), paste(name2, "missing in", name1))
 
-  if(dim(df)[1] > min_obs_for_csv) {
+  if(!is.null(min_obs_for_csv) && dim(df)[1] > min_obs_for_csv) {
     
-    if(store_file) {
+    if(!dir.exists(folder)) dir.create(folder)
+    
+    cat("Dataframe dimensions are: \n")
+    cat(dim(df), "\n")
+    cat(name1, "has", na2, "values without correspondence\n")
+    cat(name2, "has", na1, "values without correspondence\n")
+    
+    
+    
+    full_path <- create_full_path(folder, paste0(name1, ".v.", name2, ".csv"))
+    
     write.csv(df, path = full_path)
-    print(paste("File stored in ", full_path))
+    cat(paste("File stored in ", full_path))
+    
+    
     }
     
-    } 
-
-  if(verbose) {
-  cat("Dataframe dimensions are: \n")
-  cat(dim(df), "\n")
-  cat(name1, "has", na2, "values without correspondence\n")
-  cat(name2, "has", na1, "values without correspondence\n")
-}
   
   df
-}
+
+  }
 

@@ -29,21 +29,25 @@
 #' odd_val_col(x)
 #' 
 odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
-                        states = NA, verbose = TRUE) {
+                        ..., verbose = TRUE) {
   
   if(!"data.frame" %in% class(df)) {
     
-    stop("This function checks objects with data.frame class only. \n")
+    stop("This function checks objects with data.frame class \n")
     
     return(invisible(NULL))
     
   }
+  
+  states <- rlang::enquos(...)
 
+  
+  if(length(states) == 0) states <- NA
   
   found_st_name <- toupper(find_st_name_col(df))
   
   df_processing <- df %>% rm_list_cols() %>% 
-    {if(!is.na(found_st_name)) cptools:::filter_st_name(., states = states) else .} %>% 
+    {if(!is.null(found_st_name)) cptools:::filter_st_name(., input = states) else .} %>% 
     rename_with(toupper) %>% 
     tibble::as_tibble()
   

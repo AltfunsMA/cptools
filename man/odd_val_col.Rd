@@ -6,13 +6,7 @@
 easy to inspect dataframe with meaningful reference columns that don't have
 NAs}
 \usage{
-odd_val_col(
-  df,
-  refCols = c(1, 2),
-  oddValues = "NAs",
-  states = NA,
-  verbose = TRUE
-)
+odd_val_col(df, refCols = c(1, 2), oddValues = "NAs", ..., verbose = TRUE)
 }
 \arguments{
 \item{df}{Dataframe in which to check for odd values.}
@@ -27,7 +21,7 @@ The option \code{"negative"} checks if any
 numeric column is negative. Alternatively, a string vector can be supplied
 that will used to check.}
 
-\item{states}{Accepts either a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case, or the following options: 
+\item{...}{Accepts symbols or a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case. The following options: 
 \itemize{
 \item{\code{"poor_coverage"}: Jammu & Kashmir and Uttarakhand because of frequent problems in maps and dataset coverage}
  \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}

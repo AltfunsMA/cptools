@@ -105,14 +105,15 @@ rename_states <- function(df) {
   
   # TODO: fuzzy matching with list of correct names
 
-  # From common mistakes already observed
+  # Old spellings and some common mistakes observed in datasets
   straightforw <- c("Arunanchal Pradesh" = "Arunachal Pradesh",
                     "Himachal Pradeshh" = "Himachal Pradesh",
                     "Orissa" = "Odisha",
+                    "Uttaranchal" = "Uttarakhand",
                     "Pondicherry" = "Puducherry",
-                    "Jammu & Kashmir" = "Jammu and Kashmir")
+                    "Jammu and Kashmir" = "Jammu & Kashmir")
   
-  delhi <- function(v) {
+  find_n_replace_delhi <- function(v) {
     
     v[grepl("Delh", v)] <- "Delhi"
     
@@ -121,7 +122,7 @@ rename_states <- function(df) {
   
   df %>% 
     mutate({{ col }} := recode({{ col }}, !!! straightforw),
-           {{col}} := fct_relabel({{col}}, delhi))
+           {{col}} := fct_relabel({{col}}, find_n_replace_delhi))
   
   
 }
@@ -199,6 +200,27 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
 
 
 
+#' Checking if object contains a pattern in its names
+#'
+#' @param obj An R object with names
+#' @param pattern A regex pattern as a character vector to use with grepl
+#' @param ... Additional arguments passed to grepl
+#'
+#' @return the matches of `pattern` in `obj` names
+#' @export
+#'
+#' @examples
+#' 
+#' peek_names(mtcars)
+#' 
+peek_names <- function(obj, pattern, ...) {
+  
+  names(obj)[grepl(pattern, names(obj), ...)]
+  
+}
+
+
+
 #' Re-attaches package (restarting session)
 #'
 #' @param pkg An R package as a string 
@@ -251,36 +273,45 @@ restart_reattach <- function(pkg= NULL) {
 #' (Hindi for "state" or "province").
 #' @export
 find_st_name_col <- function(df, df_nm = "df") {
+
+
+  common_patterns <- "^ST_NAME$|^STATE$"
   
-  # The two most common in order of preference
-  # This function is often called to remove non-CP states
-  for (i in c("^ST_NAME$", "^STATE$")) {
-   
-     if (any(grepl(i, names(df), ignore.case = TRUE)))
-    {
-      {
-        st_name_col <- stringi::stri_extract_first_regex(names(df), i, case_insensitive=TRUE)
+  st_name_col <- grep(common_patterns, names(df), ignore.case = TRUE, value = T)
         
-        out <- st_name_col[!is.na(st_name_col)]
+  if(length(st_name_col) == 1) {
         
-        if (sum(is.na(dplyr::pull(df, out))) > 0)  {
+        if (sum(is.na(df[[st_name_col]])) > 0)  {
           
-          warning("State column ", out, " in ", df_nm, " contains NA values.",
+          warning("State column ", st_name_col, " in ", df_nm, " contains NA values.",
           " cptools functions will always remove/ignore those rows",
           immediate. = TRUE)
           
         }
         
-        return(out)
+        return(st_name_col)
         
-      }
-      
-    }
+  } else if (length(st_name_col) > 1) {
+     
     
-  }
+    warning("More than one column named 'ST_NAME' or 'STATE' present.\n",
+            st_name_col[1], " selected. Please specify in the function call.",
+            call. = FALSE)
+    
+    return(st_name_col[1])
+    
+   }
+
   
   
-  sample_state_name <- "\\bPradesh"
+  sample_state_name <- c("Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
+                         "Chhattisgarh", "Delhi", "Goa", "Gujarat", "Haryana",
+                         "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", 
+                         "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", 
+                         "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha",
+                         "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+                         "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", 
+                         "West Bengal")
   
   df_search <- df %>%
     rm_list_cols() %>%
@@ -294,11 +325,17 @@ find_st_name_col <- function(df, df_nm = "df") {
                                           ignore.case = TRUE)
                                )
   ) %>% 
-    # the "select_if" above also returns columns that are all NAs
     tidyr::replace_na(FALSE) 
   
   
   st_name_col <- names(df_search)[cols_w_state_name]
+
+  
+  if (length(st_name_col) == 0) {
+
+        return(NULL)
+    
+    }
   
   if(length(st_name_col) > 1) {
     warning("No columns named STATE or ST_NAME found.",
@@ -306,6 +343,8 @@ find_st_name_col <- function(df, df_nm = "df") {
     cat(st_name_col, "\n", sep =", ")
     cat(st_name_col[1], "used.  \n")
   }
+  
+  
   
   st_name_col[1]
   
