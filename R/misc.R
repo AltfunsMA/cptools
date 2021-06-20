@@ -93,7 +93,7 @@ rm_list_cols <- function(x) {
 #' Rename states
 #'
 #' @param df dataframe with a column containing Indian states (automatically
-#'   found by \code{find_st_name_col}), potentially with older names like
+#'   found by \code{find_st_name}), potentially with older names like
 #'   'Orissa', 'Pondicherry', etc.
 #'
 #' @return The same dataframe but with STATE/ST_NAME columm recoded
@@ -101,7 +101,7 @@ rm_list_cols <- function(x) {
 #' 
 rename_states <- function(df) {
   
-  col <- sym(find_st_name_col(df))
+  col <- sym(find_st_name(df))
   
   # TODO: fuzzy matching with list of correct names
 
@@ -146,12 +146,20 @@ rename_states <- function(df) {
 #' 
 #' sample_text <- c("ag;als", "w a;lsg;lak B", "l A jlajksf k")
 #' 
-#' str_count(sample_text, bound_rx(letters)
-bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b", 
+#' str_count(sample_text, bound_rx(letters))
+bound_rx <- function(rx_var,
+                     leftbound = "\\b",
+                     rightbound = "\\b",
                      by_element = FALSE) {
   
-  if(!is.character(rx_var)) 
-  {stop("Cannot build regex.", deparse(substitute(rx_var)), " is not a character vector")}
+  
+  if (!is.character(rx_var)) {
+    
+    stop("Cannot build regex.",
+         deparse(substitute(rx_var)),
+         " is not a character vector")
+    
+  }
   
   rx_var <- gsub("\n", "", rx_var)
   
@@ -159,45 +167,42 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
   rightmost <- paste0(rightbound, ")")
   collapse_str = paste0(rightbound, "|", leftbound)
   
-  add_bounds <- function(s)  paste0(leftmost, s, rightmost)
+  add_bounds <- function(s)
+    paste0(leftmost, s, rightmost)
   
   
-  if(length(rx_var) > 1 && by_element == FALSE) {
-    
+  if (length(rx_var) > 1 && by_element == FALSE) {
     add_bounds(paste0(rx_var, collapse = collapse_str))
     
   } else if (length(rx_var) > 1 && by_element == TRUE) {
-    
     add_bounds(rx_var)
     
-  }
-  
-  else if(is.na(rx_var)) {return(rx_var)}
-  
-
-  else if(grepl("(?", rx_var, fixed = T)) {
     
+  }  else if (is.na(rx_var)) {
+    return(rx_var)
+    
+    
+  }  else if (grepl("(?", rx_var, fixed = T)) {
     warning("bound_rx detected lookarounds, string supplied returned untouched.")
     
     rx_var
     
-  }
-  
-  
-  else if(grepl("\\|", rx_var)) {
+  } else if (grepl("\\|", rx_var)) {
+    
+    first <- gsub("(", "(\\b", rx_var, fixed = T)
+    
+    medium <- gsub("|", "\\b|\\b", first, fixed = T)
+    
+    gsub(")", "\\b)", medium, fixed = T)
     
     
-    stringi::stri_replace_all_fixed(rx_var,
-                                    c("|", "(", ")"),
-                                    c("\\b|\\b", "(\\b", "\\b)"))
+    
+  } else {
+    add_bounds(rx_var)
+    
   }
-  
-  
-  else {add_bounds(rx_var)}
-  
   
 }
-
 
 
 #' Checking if object contains a pattern in its names
@@ -215,7 +220,7 @@ bound_rx <- function(rx_var, leftbound = "\\b", rightbound = "\\b",
 #' 
 peek_names <- function(obj, pattern, ...) {
   
-  names(obj)[grepl(pattern, names(obj), ...)]
+  grep(pattern, names(obj), value = TRUE, ...)
   
 }
 
@@ -261,7 +266,7 @@ restart_reattach <- function(pkg= NULL) {
 }
 
 
-#' Find the column containing state names
+#' Find the element containing state names
 #'
 #' @param df A dataframe with one or more columns containing Indian state names
 #'
@@ -272,81 +277,89 @@ restart_reattach <- function(pkg= NULL) {
 #' it will search in character columns for those containing the word "Pradesh"
 #' (Hindi for "state" or "province").
 #' @export
-find_st_name_col <- function(df, df_nm = "df") {
+find_st_name <- function(obj, df_nm = "<your_object>") {
 
 
   common_patterns <- "^ST_NAME$|^STATE$"
   
-  st_name_col <- grep(common_patterns, names(df), ignore.case = TRUE, value = T)
+  ST_NAME <- grep(common_patterns, names(obj), ignore.case = TRUE, value = T)
         
-  if(length(st_name_col) == 1) {
+  if(length(ST_NAME) == 1) {
         
-        if (sum(is.na(df[[st_name_col]])) > 0)  {
+        if (sum(is.na(obj[[ST_NAME]])) > 0)  {
           
-          warning("State column ", st_name_col, " in ", df_nm, " contains NA values.",
+          warning("State column ", ST_NAME, " in ", df_nm, " contains NA values.",
           " cptools functions will always remove/ignore those rows",
           immediate. = TRUE)
           
         }
         
-        return(st_name_col)
+        return(ST_NAME)
         
-  } else if (length(st_name_col) > 1) {
-     
+  } 
+  
+  
+      all_state_names <- c("Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
+                           "Chhattisgarh", "Delhi", "Goa", "Gujarat", "Haryana",
+                           "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", 
+                           "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", 
+                           "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha",
+                           "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+                           "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", 
+                           "West Bengal")
     
+      all_state_names <- bound_rx(all_state_names)
+  
+  
+  if (length(ST_NAME) > 1) {
+    
+    
+    # TODO: select the vector with the greatest number of states
+     # lapply(obj[[ST_NAME]], grepl, FUN.VALUE = logical(1), sample_state_name)
+      
+      
     warning("More than one column named 'ST_NAME' or 'STATE' present.\n",
-            st_name_col[1], " selected. Please specify in the function call.",
+            ST_NAME[1], " selected. Please specify in the function call.",
             call. = FALSE)
     
-    return(st_name_col[1])
+    return(ST_NAME[1])
     
    }
 
+
   
-  
-  sample_state_name <- c("Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
-                         "Chhattisgarh", "Delhi", "Goa", "Gujarat", "Haryana",
-                         "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", 
-                         "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", 
-                         "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha",
-                         "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
-                         "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", 
-                         "West Bengal")
-  
-  df_search <- df %>%
+  df_search <- obj %>%
     rm_list_cols() %>%
     dplyr::mutate(across(where(is.factor), as.character)) %>%
     dplyr::select(where(is.character))
   
-  rm(df)
+  rm(obj)
   
-  cols_w_state_name <- purrr::map_lgl(df_search,
-                               ~any(grepl(sample_state_name, .x,
-                                          ignore.case = TRUE)
-                               )
-  ) %>% 
+  cols_w_state_name <- vapply(df_search, FUN.VALUE = logical(1), function(col) { 
+    any(grepl(all_state_names), col, ignore.case = TRUE)
+    }) %>% 
     tidyr::replace_na(FALSE) 
   
   
-  st_name_col <- names(df_search)[cols_w_state_name]
+  ST_NAME <- names(df_search)[cols_w_state_name]
 
   
-  if (length(st_name_col) == 0) {
+  if (length(ST_NAME) == 0) {
 
         return(NULL)
     
     }
   
-  if(length(st_name_col) > 1) {
+  if(length(ST_NAME) > 1) {
     warning("No columns named STATE or ST_NAME found.",
-            " The following columns contained 'Pradesh': \n") 
-    cat(st_name_col, "\n", sep =", ")
-    cat(st_name_col[1], "used.  \n")
+            " The following columns contained at least one Indian state name: \n") 
+    cat(ST_NAME, "\n", sep =", ")
+    cat(ST_NAME[1], "used.  \n")
   }
   
   
   
-  st_name_col[1]
+  ST_NAME[1]
   
 }
 
@@ -376,7 +389,7 @@ replace_xy <- function(tbl, vars = NULL, ending_to_keep = ".x"){
     vars <- tbl %>%
       rm_list_cols() %>% 
       dplyr::select(dplyr::contains(ending_to_keep)) %>%
-      dplyr::rename_all(~stringi::stri_replace_all_fixed(., ending_to_keep, "")) %>%
+      dplyr::rename_all(~gsub(ending_to_keep, "", .x)) %>%
       colnames() %>%
       unique()
 

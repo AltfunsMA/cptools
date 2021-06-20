@@ -7,7 +7,7 @@
 filter_cpw1_states(df, state_col_name = NULL)
 }
 \arguments{
-\item{df}{An object with class data.frame that has ONE column of Indian states.}
+\item{df}{An object with class data.frame that has a column of Indian states.}
 
 \item{state_col_name}{If more than column is known to be present, introduce
 the name of the correct column here as a string.}

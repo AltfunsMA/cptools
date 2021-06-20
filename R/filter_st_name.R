@@ -4,15 +4,7 @@ filter_st_name <- function(df, input,
                            warn = TRUE, df_nm = "df") {
   
   
-  if (length(input) == 1 && is.na(input)) {
-    
-    # when passing from odd_val_col or other internal functions
-    
-    return(df)
-    
-  }
-  
-  if(is.null(state_col_name)) {state_col_name <- find_st_name_col(df, df_nm)}
+  if(is.null(state_col_name)) {state_col_name <- find_st_name(df, df_nm)}
   
   if(is.null(state_col_name)) { 
     
@@ -164,28 +156,38 @@ filter_st_name <- function(df, input,
 
 #' Exclude (types of) Indian states or Union Territories
 
-#' @param df An object with class data.frame that has ONE column of Indian states.
+#' @param df An object with class data.frame that has a column of Indian states.
 #' @param state_col_name If more than column is known to be present, introduce
-#' the name of the correct column here as a string.
-#' @param ... Accepts symbols or a character vector of state names, which will be made into a regex with \code{bound_rx(vector, "", "")} and ignore case. The following options: 
-#' \itemize{
-#' \item{\code{"poor_coverage"}: Jammu & Kashmir and Uttarakhand because of frequent problems in maps and dataset coverage}
-#'  \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids Wave 1}
-#'  \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
-#'  \item{\code{"no_vidhan"}: those Union Territories without legislative assembly}
-#'  \item{\code{"northeast"}: Assam, Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Meghalaya, Sikkim)}
-#'  \item{\code{"all_above"}: all states in previous options}
-#' }
-#' 
+#'   the name of the correct column here as a string.
+#' @param ... State or Union Territory names either in full or in part. Case
+#'   insensitive. Accepts symbols (bare text) or quoted strings (see details
+#'   below). If a symbol refers to a character vector in the global environment,
+#'   the vector contents and not the symbol will be part of the search. The
+#'   following options are special and can be used in addition to others both as
+#'   strings and as symbols: \itemize{ \item{\code{"poor_coverage"}: Jammu &
+#'   Kashmir and Uttarakhand because of frequent problems in maps and dataset
+#'   coverage} \item{\code{"not_in_cpw1"} for those not in Consumer Pyramids
+#'   Wave 1} \item{\code{"small_rich"}: Goa, Delhi, Puducherry and Chandigarh}
+#'   \item{\code{"no_vidhan"}: those Union Territories without legislative
+#'   assembly} \item{\code{"northeast"}: Assam, Arunachal Pradesh, Nagaland,
+#'   Manipur, Mizoram, Tripura, Meghalaya, Sikkim)} \item{\code{"all_above"}:
+#'   all states in previous options} }
 #'
+#' @details The elements from ... are processed and coerced into a string
+#'   vectorthat is then turned into a regex by \code{cptools::bound_rx(vector,
+#'   "", "")} ignoring case.
+#'
+#'   `exclude_states(df, and, "Mizoram", my_states)` will exclude Andhra
+#'   Pradesh, Mizoram and the contents of `my_states` if it is in the Global
+#'   Environment
 #'
 #' @return The same object WITHOUT rows referring to the relevant states
 #'
-#' #'
-#' @return The same data.frame object WITHOUT rows referring to the relevant states
-#' @export
-#' 
 #'
+#'
+#' @export
+#'
+#' 
 exclude_states <- function(df, ..., state_col_name = NULL) {
   
   df_nm <- deparse(substitute(df))
@@ -202,7 +204,14 @@ exclude_states <- function(df, ..., state_col_name = NULL) {
 #' Select only rows with given (types of) Indian states or Union Territories
 #'
 #' @inheritParams exclude_states  
+#' @details The elements from ... are processed and coerced into a string
+#'   vectorthat is then turned into a regex by \code{cptools::bound_rx(vector,
+#'   "", "")} ignoring case.
 #'
+#'   `include_states(df, and, "Mizoram", my_states)` will include Andhra
+#'   Pradesh, Mizoram and the contents of `my_states` if it is in the Global
+#'   Environment
+#'   
 #' @return The same data.frame object WITH ONLY rows referring to the relevant states
 #' @export
 #'

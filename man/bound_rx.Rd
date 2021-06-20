@@ -26,5 +26,5 @@ Find all individual letters in a text regardless of case.
 
 sample_text <- c("ag;als", "w a;lsg;lak B", "l A jlajksf k")
 
-str_count(sample_text, bound_rx(letters)
+str_count(sample_text, bound_rx(letters))
 }

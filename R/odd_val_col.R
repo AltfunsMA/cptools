@@ -13,7 +13,6 @@
 #' that will used to check.
 #' @param df_type 
 #' as \code{refCols}.
-#' @inheritParams exclude_states
 #' @param verbose Whether to print messages to the console.
 #' 
 #' @details The \code{states} argument calls \code{exclude_states}
@@ -28,8 +27,7 @@
 #'
 #' odd_val_col(x)
 #' 
-odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
-                        ..., verbose = TRUE) {
+odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs", verbose = TRUE) {
   
   if(!"data.frame" %in% class(df)) {
     
@@ -38,16 +36,11 @@ odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs",
     return(invisible(NULL))
     
   }
-  
-  states <- rlang::enquos(...)
 
   
-  if(length(states) == 0) states <- NA
-  
-  found_st_name <- toupper(find_st_name_col(df))
+  found_st_name <- toupper(find_st_name(df))
   
   df_processing <- df %>% rm_list_cols() %>% 
-    {if(!is.null(found_st_name)) cptools:::filter_st_name(., input = states) else .} %>% 
     rename_with(toupper) %>% 
     tibble::as_tibble()
   

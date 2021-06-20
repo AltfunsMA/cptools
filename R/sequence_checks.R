@@ -53,7 +53,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
   
   if(is.null(checkCols)) {
     
-    group_name <- find_st_name_col(df) %>% tolower() %>% sym()
+    group_name <- find_st_name(df) %>% tolower() %>% sym()
     
     seq_name <- sym("ac_no")
     

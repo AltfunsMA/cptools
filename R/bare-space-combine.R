@@ -16,9 +16,6 @@ bare_space_combine <- function() {
   
   
   
-  
-  
-  
   ctx <- rstudioapi::getActiveDocumentContext()
   
   if (!is.null(ctx)) {
