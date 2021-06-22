@@ -44,10 +44,10 @@ Exclude (types of) Indian states or Union Territories
 }
 \details{
 The elements from ... are processed and coerced into a string vector
-that is then turned into an atomic regex by \code{cptools::bound_rx(vector,
+  that is then turned into an atomic regex by \code{cptools::bound_rx(vector,
   "", "")}, and finally passed to \code{grepl}.
 
   \code{exclude_states(df, and, "Mizoram", my_states)} will exclude Andhra
-  Pradesh, Mizoram and the contents of \code{my_states} if it is in the Global
-  Environment
+  Pradesh, Mizoram and the contents of \code{my_states} if it is a character
+  vector in the call stack.
 }

@@ -37,7 +37,8 @@ the name of the correct column here as a string.}
 \item{ignore_case}{should case be ignored.}
 }
 \value{
-The same data.frame object WITH ONLY rows referring to the relevant states
+The same data.frame object WITH ONLY rows referring to the relevant
+  states
 }
 \description{
 Select only rows with given (types of) Indian states or Union Territories
@@ -47,7 +48,7 @@ The elements from ... are processed and coerced into a string
   vectorthat is then turned into a regex by \code{cptools::bound_rx(vector,
   "", "")} ignoring case.
 
-  `include_states(df, and, "Mizoram", my_states)` will include Andhra
-  Pradesh, Mizoram and the contents of `my_states` if it is in the Global
-  Environment
+  \code{include_states(df, and, "Mizoram", my_states)} will include Andhra
+  Pradesh, Mizoram and the contents of \code{my_states} if it is a character
+  vector in the call stack.
 }

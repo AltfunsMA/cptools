@@ -17,7 +17,7 @@ filter_st_name <- function(df, input,
 
   if(length(input) == 0) {
     
-    stop("No selection passed", immediate. = T, call. = F)
+    stop("The ... arguments are required. See ?include/exclude_states for options", call. = F)
     
     
   } else if(inherits(input, "quosures")) {
@@ -28,13 +28,15 @@ filter_st_name <- function(df, input,
     types <- vapply(expressions, typeof, character(1))
     
     
-    str_from_symbols <- vapply(expressions[types == "symbol"], rlang::as_name, character(1))
+    str_from_symbols <- vapply(expressions[types == "symbol"], rlang::as_name, 
+                               character(1))
     
 
     if(length(str_from_symbols) > 0) {
       
       
-      str_from_objects <- mget(str_from_symbols, ifnotfound = list(NULL), inherits = T)
+      str_from_objects <- mget(str_from_symbols, ifnotfound = list(NULL), 
+                               inherits = T)
       
       confirmed_symbols <- vapply(str_from_objects, is.null, logical(1))
       
@@ -55,9 +57,11 @@ filter_st_name <- function(df, input,
         
             if(length(non_char_obj) > 0) {
               
-              warning("You have passed the following symbol(s) that refer to non-character object(s) in one of your environments.",
+              warning("You have passed the following symbol(s) that refer",
+              "to non-character object(s) in one of your environments.",
                       paste0(" - ", names(non_char_obj), sep = "\n"),
-                      "We have used them as literal location names for filtering. Was this your intention?")
+                      "We have used them as literal location names for",
+                      "filtering. Was this your intention?")
             }
         
         } else {
@@ -86,14 +90,15 @@ filter_st_name <- function(df, input,
     if(types == "NULL" || 
       (types == "language" && length(unlist(str_from_languages)) == 0)) {
       
-      warning("NULL value or empty vector supplied. No rows returned.", call. = FALSE)
+      warning("NULL value or empty vector supplied. No rows returned.", 
+              call. = FALSE)
       
       return(df[FALSE,])
       
     } 
     
     
-    poor_coverage <- c("Jammu & Kashmir", "Uttarakhand")
+    poor_coverage <- c("Jammu & Kashmir")
     
     not_in_cpw1 = c("Arunachal Pradesh", "Nagaland",
                     "Manipur", "Mizoram", "Tripura",
@@ -129,7 +134,8 @@ filter_st_name <- function(df, input,
     if(length(selected_options) == 0) selected_options <- ""
     
     # browser()
-    str_to_filter <- c(final_strings[!final_strings %in% selected_options],all_options[[selected_options]])
+    str_to_filter <- c(final_strings[!final_strings %in% selected_options], 
+                       unlist(all_options[selected_options]))
     
     
     if(length(str_to_filter) == 0) {
@@ -202,12 +208,12 @@ filter_st_name <- function(df, input,
 #' @param ignore_case should case be ignored.
 #'
 #' @details The elements from ... are processed and coerced into a string vector
-#' that is then turned into an atomic regex by \code{cptools::bound_rx(vector,
+#'   that is then turned into an atomic regex by \code{cptools::bound_rx(vector,
 #'   "", "")}, and finally passed to \code{grepl}.
 #'
 #'   \code{exclude_states(df, and, "Mizoram", my_states)} will exclude Andhra
-#'   Pradesh, Mizoram and the contents of \code{my_states} if it is in the Global
-#'   Environment
+#'   Pradesh, Mizoram and the contents of \code{my_states} if it is a character
+#'   vector in the call stack.
 #'
 #' @return The same object WITHOUT rows referring to the relevant states
 #'
@@ -222,7 +228,7 @@ exclude_states <- function(df, ..., state_col_name = NULL, fixed = FALSE, ignore
   
   states <- rlang::enquos(...)
   
-filter_st_name(df = df, states, state_col_name = state_col_name,
+ cptools:::filter_st_name(df = df, states, state_col_name = state_col_name,
                  exclude = TRUE, df_nm = df_nm)
   
   
@@ -231,25 +237,26 @@ filter_st_name(df = df, states, state_col_name = state_col_name,
 
 #' Select only rows with given (types of) Indian states or Union Territories
 #'
-#' @inheritParams exclude_states  
+#' @inheritParams exclude_states
 #' @details The elements from ... are processed and coerced into a string
 #'   vectorthat is then turned into a regex by \code{cptools::bound_rx(vector,
 #'   "", "")} ignoring case.
 #'
-#'   `include_states(df, and, "Mizoram", my_states)` will include Andhra
-#'   Pradesh, Mizoram and the contents of `my_states` if it is in the Global
-#'   Environment
-#'   
-#' @return The same data.frame object WITH ONLY rows referring to the relevant states
-#' @export
+#'   \code{include_states(df, and, "Mizoram", my_states)} will include Andhra
+#'   Pradesh, Mizoram and the contents of \code{my_states} if it is a character
+#'   vector in the call stack.
 #'
+#' @return The same data.frame object WITH ONLY rows referring to the relevant
+#'   states
+#' @export
+#' 
 include_states <- function(df, ..., state_col_name = NULL, fixed = FALSE, ignore_case = TRUE) {
   
   df_nm <- deparse(substitute(df))
 
   states <- rlang::enquos(...)
   
-filter_st_name(df = df, states, state_col_name = state_col_name,
+cptools:::filter_st_name(df = df, states, state_col_name = state_col_name,
                  exclude = FALSE, df_nm = df_nm)
   
 }

@@ -179,7 +179,7 @@ bound_rx <- function(rx_var,
   
   if (!is.character(rx_var) || length(rx_var) == 0) {
     
-    stop("Cannot build regex.",
+    stop("Cannot build regex. ",
          deparse(substitute(rx_var)),
          " is not a character vector with length greater than 0")
     
@@ -410,12 +410,13 @@ replace_xy <- function(tbl, vars = NULL, ending_to_keep = ".x"){
   # deduplicated
   if(is.null(vars)) {
 
-    vars <- tbl %>%
-      rm_list_cols() %>% 
-      dplyr::select(dplyr::contains(ending_to_keep)) %>%
-      dplyr::rename_all(~gsub(ending_to_keep, "", .x)) %>%
-      colnames() %>%
-      unique()
+    
+    cols_nm <- colnames(rm_list_cols(tbl))
+    
+    affected_cols <- grep(ending_to_keep, cols_nm, value = T, fixed = T)
+    
+    vars <- unique(gsub(ending_to_keep, "", affected_cols, fixed = TRUE))
+
 
   }
 
