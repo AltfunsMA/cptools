@@ -27,6 +27,30 @@ date_str <- function(format = "%Y%m%d_%H%M", tz = "Australia/Melbourne") {
 
 
 
+#' Renames an sf object geometry column (e.g. to allow rbind to work)
+#'
+#' @param obj An sf object
+#' @param name The new name
+#'
+#' @return An sf object
+#' @export
+#'
+#' @examples
+rename_geometry <- function(obj, name) {
+  
+  current = attr(obj, "sf_column")
+  
+  names(obj)[names(obj)==current] = name
+  
+  st_geometry(obj)=name
+  
+  obj
+  
+  
+}
+
+
+
 
 
 
@@ -153,11 +177,11 @@ bound_rx <- function(rx_var,
                      by_element = FALSE) {
   
   
-  if (!is.character(rx_var)) {
+  if (!is.character(rx_var) || length(rx_var) == 0) {
     
     stop("Cannot build regex.",
          deparse(substitute(rx_var)),
-         " is not a character vector")
+         " is not a character vector with length greater than 0")
     
   }
   

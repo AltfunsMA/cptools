@@ -4,7 +4,13 @@
 \alias{exclude_states}
 \title{Exclude (types of) Indian states or Union Territories}
 \usage{
-exclude_states(df, ..., state_col_name = NULL)
+exclude_states(
+  df,
+  ...,
+  state_col_name = NULL,
+  fixed = FALSE,
+  ignore_case = TRUE
+)
 }
 \arguments{
 \item{df}{An object with class data.frame that has a column of Indian states.}
@@ -25,6 +31,10 @@ all states in previous options} }}
 
 \item{state_col_name}{If more than column is known to be present, introduce
 the name of the correct column here as a string.}
+
+\item{fixed}{should the names be matched strictly.}
+
+\item{ignore_case}{should case be ignored.}
 }
 \value{
 The same object WITHOUT rows referring to the relevant states
@@ -33,11 +43,11 @@ The same object WITHOUT rows referring to the relevant states
 Exclude (types of) Indian states or Union Territories
 }
 \details{
-The elements from ... are processed and coerced into a string
-  vectorthat is then turned into a regex by \code{cptools::bound_rx(vector,
-  "", "")} ignoring case.
+The elements from ... are processed and coerced into a string vector
+that is then turned into an atomic regex by \code{cptools::bound_rx(vector,
+  "", "")}, and finally passed to \code{grepl}.
 
-  `exclude_states(df, and, "Mizoram", my_states)` will exclude Andhra
-  Pradesh, Mizoram and the contents of `my_states` if it is in the Global
+  \code{exclude_states(df, and, "Mizoram", my_states)} will exclude Andhra
+  Pradesh, Mizoram and the contents of \code{my_states} if it is in the Global
   Environment
 }

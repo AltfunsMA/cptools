@@ -48,13 +48,20 @@ test_that("Null or empty vector selection returns an empty df with a warning",
           expect_equal(nrow(suppressWarnings(exclude_states(sf_sample, NULL))), 0)
             })
 
+test_that("Warnings appear for mismatched objects",
+          expect_warning(exclude_states(sf_sample, mtcars, "Guj", "small_rich"), "non-character"))
+
+test_that("fixed and ignore case arguments are passed on correctly", {
+          expect_equal(nrow(include_states(sf_sample, "Guj", fixed = TRUE)), 0)
+          expect_equal(nrow(exclude_states(sf_sample, "guj", ignore_case = FALSE)), 0)
+          })
+
 test_that("Filters and by implication state selection works", {
   expect_error(exclude_states(mtcars, "tamil"), "No column")
   expect_equal(nrow(exclude_states(sf_sample, no_vidhan)), n-50-51)
   expect_equal(nrow(exclude_states(sf_sample, "not_in_cpw1")), n-50)
   expect_equal(nrow(include_states(sf_sample, Gujarat)), (178))
   expect_equal(nrow(include_states(sf_sample, "no_vidhan")), 101)
-  expect_equal(nrow(filter_cpw1_states(sf_sample)), n-50)
   expect_error(include_states(sf_sample))
   expect_error(exclude_states(sf_sample))
 })
@@ -65,7 +72,7 @@ test_that("Different types of input yield the same output", {
                exclude_states(sf_sample, small_rich))
   expect_equal(exclude_states(sf_sample, "Guj"),
                exclude_states(sf_sample, guj))
-  expect_equal(exclude_states(sf_sample, mtcars, "Guj", "small_rich"),
-               exclude_states(sf_sample, mtcars, Guj, small_rich))
+  expect_equal(suppressWarnings(exclude_states(sf_sample, mtcars, "Guj", "small_rich")),
+               suppressWarnings(exclude_states(sf_sample, mtcars, Guj, small_rich)))
 
 })
