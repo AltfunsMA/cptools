@@ -26,6 +26,36 @@ date_str <- function(format = "%Y%m%d_%H%M", tz = "Australia/Melbourne") {
 }
 
 
+#' Split an R object into approximately equally sized chunks
+#'
+#' @param x A dataframe or another . A dataframe will be chunked by rows; other
+#'   objects by length
+#' @param chunk_size An integer value.
+#'
+#' @return A list. See 'help(split)' for details.
+#' @export
+#'
+#' @examples
+split_into_chunks <- function(x, chunk_size) {
+  
+  if(inherits(x, "data.frame")) {
+    
+    n <- nrow(x)
+    
+  } else {
+    
+    n <- length(x)  
+    
+  }
+  
+  r  <- rep(1:ceiling(n/chunk_size),each=chunk_size)[1:n]
+  
+  split(x, r)
+  
+}
+
+
+
 
 #' Renames an sf object geometry column (e.g. to allow rbind to work)
 #'

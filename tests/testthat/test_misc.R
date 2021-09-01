@@ -29,7 +29,6 @@ test_that(".x and .y suffixes are coalesced", {
 })
 
 test_that("bounding regexes works under various assumptions", {
-  
   expect_error(bound_rx(c(TRUE, FALSE, TRUE)), "Cannot build regex")
   expect_error(bound_rx(NA), "Cannot build regex")
   expect_equal(bound_rx(sample_string), "(\\bone\\b|\\btwo\\b)")
@@ -37,6 +36,12 @@ test_that("bounding regexes works under various assumptions", {
   expect_warning(bound_rx("(?<something)tosearch"), "lookarounds")
 
 })
+
+test_that("split_into_chunks yields the correct number of outputs", {
+  expect_equal(length(split_into_chunks(mtcars, 10)), 4)
+  expect_equal(length(split_into_chunks(iris$Sepal.Length, 3)), 50)
+})
+
 
 # TODO: test the rename states and other functions
 
