@@ -20,8 +20,6 @@ ellipsis_to_vector <- function(...) {
 #' wind <- c("wind turbine", "wind farm")
 #' 
 #' named_energy <- lnm(solar, wind)
-#' 
-
 lnm <- function(...) {
   
  out <- list(...)
@@ -51,7 +49,6 @@ lnm <- function(...) {
 #' 
 #' named_energy <- cnm(solar, wind)
 #' 
-
 cnm <- function(...) {
   
   

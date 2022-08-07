@@ -29,13 +29,7 @@
 #' 
 odd_val_col <- function(df, refCols = c(1,2), oddValues = "NAs", verbose = TRUE) {
   
-  if(!"data.frame" %in% class(df)) {
-    
-    stop("This function checks objects with data.frame class \n")
-    
-    return(invisible(NULL))
-    
-  }
+  cptools:::check_df(df)
 
   
   found_st_name <- toupper(find_st_name(df))

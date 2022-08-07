@@ -31,5 +31,5 @@ test_that("Returns correct number of values", {
 })
 
 test_that("Returns error messages", {
-    expect_error(odd_val_col(NA), "This function checks")
+    expect_error(odd_val_col(NA), "\r     ")
 })

@@ -50,6 +50,7 @@ find_acno_incomplete <- function(df, checkCols = NULL,
                              step = NULL,
                              verbose = FALSE) {
   
+  cptools:::check_df(df)
   
   if(is.null(checkCols)) {
     
@@ -97,7 +98,10 @@ find_acno_incomplete <- function(df, checkCols = NULL,
   
   
   
-  find_seq_incomplete(df_preprocessed, c(group_name, seq_name))
+  find_seq_incomplete(df_preprocessed, c(group_name, seq_name),
+                      comparison = comparison,
+                      step = step,
+                      verbose = verbose)
   
   
   
@@ -132,7 +136,7 @@ find_seq_incomplete <- function(df,
                              step = NULL,
                              verbose = FALSE) {
   
-
+  cptools:::check_df(df)
   
   if(is.null(checkCols)) { 
     
@@ -177,14 +181,19 @@ find_seq_incomplete <- function(df,
     select(-complete_seq)
   
   if(nrow(checked_by_group) < 1) {
+    
     if(verbose) message("No missing sequences. \n")
+    
     return(invisible(NULL))
     
   }
   
+  groups_w_wrong_steps <- list()
   
+  sequences <- list()
   
-  extract_non_seq <- function(df_ext, seq_name) {
+  extract_non_seq <- function(df_ext, seq_name, debug_group) {
+    
     # Only works if the first two values have the correct 
     # difference in the sequence  
     
@@ -196,18 +205,18 @@ find_seq_incomplete <- function(df,
       
       step <- (y[2] - y[1])
       
-      message("Step defaulting to ", step)
+      if(verbose) message("Step defaulting to ", step)
       
     }
     
     if((y[2] - y[1]) != step) {
+
+      groups_w_wrong_steps <<- append(groups_w_wrong_steps, debug_group) 
+      sequences <<- append(sequences, list(y)) 
+  
       
-      print(y)
-      
-      warning("Sequence of does not start with the provided step value of", step, 
-              "Results will be unreliable.")
-      
-      }
+    }
+    
     
     difference_first_vs_second_position <- diff(y)[1]
     
@@ -221,7 +230,7 @@ find_seq_incomplete <- function(df,
     # Split by state so that only one full ac_no sequence is passed
     # to the extractor function
     split(pull(checked_by_group, !!group_name), drop = TRUE) %>% 
-    purrr::map(~extract_non_seq(.x, seq_name)) %>% 
+    purrr::imap(~extract_non_seq(.x, seq_name, .y)) %>% 
     purrr::keep(~length(.x) > 0)
   
   group_str <- rlang::expr_text(group_name)
@@ -240,6 +249,23 @@ find_seq_incomplete <- function(df,
              rowid %in% (before_gap_id + 1)) %>% 
     select(-rowid) %>% 
     rename_with(toupper)
+  
+
+  if(length(groups_w_wrong_steps) > 0) {
+    
+  warning("Sequences in ", length(groups_w_wrong_steps), 
+          " groups do not start with the provided step value of '",
+          step, "'.\nResults will be unreliable for such groups.", 
+          "\nThe full sequences for these groups (up to 50) are:",
+          call. = FALSE, immediate. = TRUE)
+    
+  tibble::tibble("group" = unlist(groups_w_wrong_steps),
+                    "sequence" = map_chr(sequences, paste(collapse = ", "))) %>% 
+      print(n = 50)
+  
+    
+  }
+    
   
   if(verbose) {
   cat("Gaps identified at", sum(lengths(extracted)), 
